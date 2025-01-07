@@ -1,12 +1,18 @@
 <script>
     import Title from "../components/Title.svelte";
 
-    const memberList = new Array(32);
+    // const memberList = require("./member.json");
+    import memberList from "./member.json";
 </script>
 
 <Title title="회원관리" />
 
 <div class="contents">
+    <div class="type">
+        <input type="checkbox" /><label for="">정기전</label>
+        <input type="checkbox" /><label for="">번개</label>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -23,11 +29,13 @@
             {#each memberList as member, i}
                 <tr>
                     <td class="index">{i + 1}</td>
-                    <td class="name"></td>
-                    <td class="count"></td>
-                    <td class="avg"></td>
-                    <td class="max"></td>
-                    <td class="min"></td>
+                    <td class="name">
+                        <a href="/score">{member.name}</a>
+                    </td>
+                    <td class="count">{member.count}</td>
+                    <td class="avg">{member.avg}</td>
+                    <td class="max">{member.max}</td>
+                    <td class="min">{member.min}</td>
                     <td class="dues">
                         <button>회비</button>
                     </td>
@@ -40,6 +48,15 @@
 <style lang="scss">
     .contents {
         padding: 1rem;
+
+        & > .type {
+            & > input {
+                margin-right: 0.5rem;
+            }
+            & > label {
+                margin-right: 1rem;
+            }
+        }
     }
 
     table {
@@ -48,6 +65,9 @@
 
     thead {
         position: sticky;
+        & > tr > th {
+            padding: 0.5rem 0;
+        }
     }
 
     td {
@@ -62,6 +82,14 @@
     }
     .name {
         width: 9rem;
+        & > a {
+            text-decoration: none;
+            color: #cccccc;
+
+            &:hover {
+                color: #888888;
+            }
+        }
     }
     .count {
         width: 4rem;
