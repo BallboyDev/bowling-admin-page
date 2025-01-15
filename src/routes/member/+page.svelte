@@ -1,8 +1,23 @@
 <script>
-    import Title from "../components/Title.svelte";
+    // @ts-nocheck
+
+    import { onMount } from "svelte";
+    import Title from "../../components/Title.svelte";
 
     // const memberList = require("./member.json");
-    import memberList from "./member.json";
+    // import memberList from "./member.json";
+    import axios from "axios";
+
+    let memberList = $state([]);
+
+    onMount(() => {
+        axios.get("http://localhost:3000/bap").then((res) => {
+            console.log("ballboy");
+            console.log(res);
+
+            memberList = res.data;
+        });
+    });
 </script>
 
 <Title title="회원관리" />
