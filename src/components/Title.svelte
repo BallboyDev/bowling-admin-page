@@ -1,9 +1,22 @@
 <script>
+    // @ts-nocheck
+
+    import { setMember } from "../lib/store/store";
+
     const { title } = $props();
+    let member = $state({});
+
+    setMember.subscribe((value) => {
+        member = value;
+    });
 </script>
 
 <div class="title">
-    <h1>{title} - 1월</h1>
+    {#if !!member.name}
+        <h1>{title} - {member?.name}</h1>
+    {:else}
+        <h1>{title}</h1>
+    {/if}
     <a href="/">home</a>
 </div>
 

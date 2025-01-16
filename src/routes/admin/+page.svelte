@@ -3,6 +3,7 @@
 
     import axios from "axios";
     import Title from "../../components/Title.svelte";
+    import { PUBLIC_API_URL } from "$env/static/public";
     import { onMount } from "svelte";
 
     let name = $state("");
@@ -19,7 +20,7 @@
             console.log("callApi");
 
             await axios
-                .post("http://localhost:3000/bap/admin/createMember", {
+                .post(`${PUBLIC_API_URL}/bap/admin/createMember`, {
                     name,
                     birth,
                     phone,
@@ -39,7 +40,7 @@
 
     const getMemberList = async () => {
         await axios
-            .get("http://localhost:3000/bap/admin/memberList")
+            .get(`${PUBLIC_API_URL}/bap/admin/memberList`)
             .then((res) => {
                 console.log(res.data);
                 memberList = res.data;

@@ -1,9 +1,37 @@
 <script>
+    // @ts-nocheck
+
+    import axios from "axios";
     import Title from "../../components/Title.svelte";
-    import records from "./records.json";
+    // import records from "./records.json";
+    import { PUBLIC_API_URL } from "$env/static/public";
+    import { onMount } from "svelte";
+    import dayjs from "dayjs";
+    import { setMember } from "../../lib/store/store";
+
+    // const id = 1;
+    let records = $state([]);
+    let member = $state({});
+
+    onMount(() => {
+        scoreList();
+    });
+
+    setMember.subscribe((value) => {
+        member = value;
+    });
+
+    const scoreList = async () => {
+        await axios
+            .get(`${PUBLIC_API_URL}/bap/scoreRecord/${member.userId}`)
+            .then((res) => {
+                console.log(res.data);
+                records = res.data;
+            });
+    };
 </script>
 
-<Title title="점수 관리 - 양승우" />
+<Title title="점수 관리" />
 
 <div class="contents">
     <div class="type">
@@ -28,24 +56,27 @@
                 {#each records as record, i}
                     <tr>
                         <td class="index">{i + 1}</td>
-                        <td class="date">{record.date}</td>
+                        <!-- <td class="date">{record.date}</td> -->
+                        <td class="date"
+                            >{dayjs(record.date).format("YYYY-MM-DD")}</td
+                        >
                         <td class="type">{record.type}</td>
-                        <td class="count">{record.scores.length}</td>
+                        <td class="count">{record.count}</td>
                         <td class="total">{record.total}</td>
                         <td class="avg">{record.avg}</td>
-                        {#each record.scores as score}
+                        {#each record.scores.split(",") as score}
                             <td class="score">{score}</td>
                         {/each}
                     </tr>
                 {/each}
-                <tr>
+                <!-- <tr>
                     <td class="index"></td>
                     <td class="date"></td>
                     <td class="type"></td>
                     <td class="count"></td>
                     <td class="total"></td>
                     <td class="avg"></td>
-                </tr>
+                </tr> -->
             </tbody>
         </table>
     </div>

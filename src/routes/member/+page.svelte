@@ -3,18 +3,14 @@
 
     import { onMount } from "svelte";
     import Title from "../../components/Title.svelte";
-
-    // const memberList = require("./member.json");
-    // import memberList from "./member.json";
+    import { PUBLIC_API_URL } from "$env/static/public";
     import axios from "axios";
+    import { setMember } from "../../lib/store/store";
 
     let memberList = $state([]);
 
     onMount(() => {
-        axios.get("http://localhost:3000/bap").then((res) => {
-            console.log("ballboy");
-            console.log(res);
-
+        axios.get(`${PUBLIC_API_URL}/bap`).then((res) => {
             memberList = res.data;
         });
     });
@@ -44,7 +40,12 @@
             {#each memberList as member, i}
                 <tr>
                     <td class="index">{i + 1}</td>
-                    <td class="name">
+                    <td
+                        class="name"
+                        onclick={() => {
+                            setMember.set(member);
+                        }}
+                    >
                         <a href="/score">{member.name}</a>
                     </td>
                     <td class="count">{member.count}</td>
