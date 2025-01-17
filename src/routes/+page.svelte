@@ -35,6 +35,8 @@
     <br />
     <a href="/score">점수</a>
     <br />
+    <a href="/temp">임시</a>
+    <br />
 </div>
 
 <style>
