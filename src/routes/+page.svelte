@@ -1,63 +1,125 @@
 <script>
-    // @ts-nocheck
-
     import { browser } from "$app/environment";
+    import { PUBLIC_API_URL } from "$env/static/public";
+    import axios from "axios";
     import { onMount } from "svelte";
-    import Title from "../components/Title.svelte";
 
-    let userInfo = $state({});
+    let name = $state("");
+    let memberNum = $state("");
 
     onMount(() => {
         if (browser) {
-            const temp = localStorage.getItem("userInfo");
-            if (temp !== null) {
-                userInfo = JSON.parse(temp);
+            const userInfo = localStorage.getItem("userInfo");
+            if (!!userInfo) {
+                location.href = "/score";
             }
         }
     });
+
+    const handle = {
+        onLogin: () => {
+            console.log("onLogin()");
+            console.log("정보 입력 필터 기능");
+            if (name === "" || memberNum === "") {
+                alert("로그인 정보를 입력해주세요");
+            }
+            callApi.login();
+        },
+        onJoin: () => {},
+    };
+
+    const callApi = {
+        login: async () => {
+            await axios
+                .get(
+                    `${PUBLIC_API_URL}/bap/login?name=${name}&num=${memberNum}`,
+                )
+                .then((res) => {
+                    const userInfo = res.data;
+
+                    if (userInfo.length > 0 && browser) {
+                        localStorage.setItem(
+                            "userInfo",
+                            `${userInfo[0].name}/${userInfo[0].memberNum}`,
+                        );
+                        location.href = "/score";
+                    } else if (userInfo.length === 0) {
+                        alert("로그인 정보를 확인해주세요");
+                    }
+                });
+        },
+    };
 </script>
 
-<Title title="메인 페이지" />
-
-<div class="contents">
-    <div class="loginInfo">
-        {#if !!userInfo?.name === null}
-            <h3>환영합니다. {userInfo.name}</h3>
-        {:else}
-            <input type="text" placeholder="로그인 정보" bind />
-            <button onclick={() => {}}>login</button>
-        {/if}
+<div id="landingPage">
+    <div class="loginBox">
+        <input
+            type="text"
+            placeholder="회원 이름을 입력해 주세요"
+            bind:value={name}
+        />
+        <input
+            type="text"
+            placeholder="회원 번호를 입력해 주세요"
+            bind:value={memberNum}
+        />
+        <div class="btnBox">
+            <button class="join">회원가입</button>
+            <button class="login" onclick={handle.onLogin}>로그인</button>
+        </div>
     </div>
-
-    <a href="/admin">관리자 페이지</a>
-    <br />
-    <a href="/member">회원관리</a>
-    <br />
-    <a href="/score">점수</a>
-    <br />
-    <a href="/temp">임시</a>
-    <br />
 </div>
 
-<style>
-    .contents {
-        padding: 1rem;
+<style lang="scss">
+    #landingPage {
+        position: absolute;
+        width: 100%;
+        height: 100%;
 
-        & > .loginInfo {
-            margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
+        & > .loginBox {
+            width: 15rem;
+
+            padding: 1rem;
+            border: 1px solid gray;
+            border-radius: 1rem;
+
+            background-color: #222222;
+            display: flex;
+            flex-direction: column;
             & > input {
-                margin-right: 1rem;
-                width: 8rem;
+                height: 2rem;
+                margin-bottom: 1rem;
+                font-size: 1rem;
+                text-align: center;
+                border-radius: 0.5rem;
             }
-            & > button {
-                width: 2.5rem;
+
+            & > .btnBox {
+                height: 2rem;
+                display: flex;
+
+                & > button {
+                    width: 50%;
+                    border: 1px solid gray;
+                    border-radius: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #cccccc;
+                }
+
+                & > .join {
+                    margin-right: 0.5rem;
+                    background-color: rgba(0, 0, 255, 0.3);
+                }
+                & > .login {
+                    background-color: rgba(255, 0, 0, 0.3);
+                }
             }
         }
-    }
-
-    a {
-        text-decoration: none;
-        color: #cccccc;
     }
 </style>
