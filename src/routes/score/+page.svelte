@@ -2,18 +2,28 @@
     // @ts-nocheck
 
     import { browser } from "$app/environment";
-
-    // @ts-nocheck
-
     import { PUBLIC_API_URL } from "$env/static/public";
+    import Add from "$lib/images/Add.svelte";
+    import Controller from "$lib/images/Controller.svelte";
+    import Dashboard from "$lib/images/Dashboard.svelte";
+    import Home from "$lib/images/Home.svelte";
+    import More from "$lib/images/More.svelte";
+    import UserInfo from "$lib/images/UserInfo.svelte";
     import axios from "axios";
     import dayjs from "dayjs";
     import { onMount } from "svelte";
+    import RegistGame from "./components/RegistGame.svelte";
+    import { Button, ButtonGroup } from "@sveltestrap/sveltestrap";
+    import AddScore from "./components/AddScore.svelte";
 
     let records = $state({});
     let popupAddScore = $state(false);
+    let popupRegistGame = $state(false);
 
     let userInfo = $state("");
+    let memberName = $derived(userInfo.split("/")[0]);
+    let memberNum = $derived(userInfo.split("/")[1]);
+    let cardId = $state(null);
 
     onMount(() => {
         if (browser) {
@@ -27,20 +37,35 @@
         }
     });
 
+    $effect(() => {
+        console.log(cardId);
+    });
+
     const handle = {
-        onAddBtn: () => {
+        onClkAddBtn: (id) => {
             popupAddScore = true;
+            cardId = id;
             console.log("onCLickAddBtn()");
         },
-        onMoreBtn: () => {
-            console.log("onMoreBtn()");
+        onClkMoreBtn: () => {
+            console.log("onClkMoreBtn()");
+        },
+        onClkHomeBtn: () => {
+            if (browser) {
+                localStorage.removeItem("userInfo");
+                location.href = "/";
+            }
+        },
+        onClkRegistGameBtn: () => {
+            popupRegistGame = true;
         },
     };
 
     const callApi = {
         getScore: async () => {
+            console.log("ballboy >>", memberName, memberNum);
             await axios
-                .get(`${PUBLIC_API_URL}/bap/scoreRecord/1`)
+                .get(`${PUBLIC_API_URL}/bap/scoreRecord/${memberNum}`)
                 .then((res) => {
                     console.log(res.data);
                     records = res.data;
@@ -50,65 +75,64 @@
 </script>
 
 {#if popupAddScore}
-    <div class="popup-addScore">
-        <div class="inputBox">
-            <input type="number" />
-            <div class="btn">
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div
-                    class="add"
-                    onclick={() => {
-                        popupAddScore = false;
-                    }}
-                >
-                    add
-                </div>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div
-                    class="cancel"
-                    onclick={() => {
-                        popupAddScore = false;
-                    }}
-                >
-                    cancel
-                </div>
-            </div>
-        </div>
-    </div>
+    <AddScore
+        {cardId}
+        onClose={() => {
+            popupAddScore = false;
+            cardId = null;
+            callApi.getScore();
+        }}
+    />
+{/if}
+
+{#if popupRegistGame}
+    <RegistGame
+        onCancel={() => {
+            popupRegistGame = false;
+        }}
+        getScore={() => {
+            callApi.getScore();
+        }}
+        {memberNum}
+    />
 {/if}
 
 <div id="tempPage">
     <div class="title">
-        <h1>양승우 (12345 / {userInfo})</h1>
+        <!-- <h1>양승우 (12345 / {userInfo})</h1> -->
+        <h1>{memberName} ({memberNum})</h1>
     </div>
     <!-- <Title title="양승우" /> -->
 
     <div class="navigator">
-        <div class="navi">HOME</div>
-        <div class="navi">회원정보수정</div>
-        <div class="navi">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="1.5rem"
-                viewBox="0 -960 960 960"
-                width="1.5rem"
-                fill="#FFFFFF"
-                ><path
-                    d="M200-160v-280h-80v-80h240v80h-80v280h-80Zm0-440v-200h80v200h-80Zm160 0v-80h80v-120h80v120h80v80H360Zm80 440v-360h80v360h-80Zm240 0v-120h-80v-80h240v80h-80v120h-80Zm0-280v-360h80v360h-80Z"
-                /></svg
-            >
-        </div>
-        <div class="navi">navi----4</div>
-        <div class="navi">navi-----5</div>
-        <div class="navi">navi------6</div>
+        <button
+            class="navi"
+            onclick={() => {
+                handle.onClkHomeBtn();
+            }}
+        >
+            <Home />&nbsp;홈
+        </button>
+        <button class="navi">
+            <Controller />&nbsp;필터
+        </button>
+        <button
+            class="navi"
+            onclick={() => {
+                handle.onClkRegistGameBtn();
+            }}
+        >
+            <Dashboard />&nbsp;게임등록
+        </button>
+        <button class="navi">
+            <UserInfo />&nbsp;회원정보수정
+        </button>
     </div>
 
     <div class="contents">
         <!-- 일시, 장소, 총점, 평균, 메모 -->
         {#each records as record}
-            <div class="card">
+            <div class="gameCard">
                 <div class="layout">
                     <div class="left">
                         <div class="place">광교진락볼링장</div>
@@ -122,17 +146,10 @@
                     <div
                         class="more"
                         onclick={() => {
-                            handle.onMoreBtn();
+                            handle.onClkMoreBtn();
                         }}
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
-                            fill="#FFFFFF"
-                            ><path
-                                d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"
-                            /></svg
-                        >
+                        <More />
                     </div>
                 </div>
                 <div class="memo">-</div>
@@ -146,16 +163,13 @@
                     {/each}
                     <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <div class="addScore" onclick={handle.onAddBtn}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
-                            fill="#FFFFFF"
-                            width="100vh"
-                            ><path
-                                d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"
-                            /></svg
-                        >
+                    <div
+                        class="addScore"
+                        onclick={() => {
+                            handle.onClkAddBtn(record.playGameId);
+                        }}
+                    >
+                        <Add />
                     </div>
                 </div>
             </div>
@@ -177,8 +191,10 @@
         & > .title {
             padding: 1rem 0;
             margin: 0 1rem;
+            /*
             height: 3rem;
             line-height: 3rem;
+            */
         }
 
         & > .navigator {
@@ -199,6 +215,9 @@
                 display: flex;
                 align-items: center;
 
+                color: white;
+                font-size: 1rem;
+
                 background-color: #282828;
             }
         }
@@ -210,7 +229,7 @@
 
             overflow: scroll;
 
-            & > .card {
+            & > .gameCard {
                 // height: 12rem;
                 margin-bottom: 1rem;
                 padding: 1rem;
@@ -241,6 +260,15 @@
 
                         &:active {
                             background-color: black;
+                        }
+
+                        & > .moreMenu {
+                            background-color: #222222;
+
+                            & > .menu {
+                                width: 2rem;
+                                height: 2rem;
+                            }
                         }
                     }
                 }
@@ -287,59 +315,6 @@
                             height: 100%;
                         }
                     }
-                }
-            }
-        }
-    }
-
-    .popup-addScore {
-        position: absolute;
-        display: flex;
-        width: 100%;
-        height: 100%;
-
-        background-color: rgba(0, 0, 0, 0.4);
-        align-items: center;
-        justify-content: center;
-
-        & > .inputBox {
-            width: 15rem;
-            // height: 6rem;
-
-            padding: 1rem;
-            border: 1px solid gray;
-            border-radius: 1rem;
-
-            background-color: #222222;
-            display: flex;
-            flex-direction: column;
-            & > input {
-                height: 2rem;
-                margin-bottom: 1rem;
-                font-size: 1.5rem;
-                text-align: center;
-                border-radius: 0.5rem;
-            }
-
-            & > .btn {
-                height: 2rem;
-                display: flex;
-
-                & > div {
-                    width: 50%;
-                    border: 1px solid gray;
-                    border-radius: 0.5rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                & > .add {
-                    margin-right: 0.5rem;
-                    background-color: rgba(0, 0, 255, 0.3);
-                }
-                & > .cancel {
-                    background-color: rgba(255, 0, 0, 0.3);
                 }
             }
         }

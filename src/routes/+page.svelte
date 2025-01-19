@@ -53,16 +53,8 @@
 
 <div id="landingPage">
     <div class="loginBox">
-        <input
-            type="text"
-            placeholder="회원 이름을 입력해 주세요"
-            bind:value={name}
-        />
-        <input
-            type="text"
-            placeholder="회원 번호를 입력해 주세요"
-            bind:value={memberNum}
-        />
+        <input type="text" placeholder="이름" bind:value={name} />
+        <input type="text" placeholder="회원 번호" bind:value={memberNum} />
         <div class="btnBox">
             <button class="join">회원가입</button>
             <button class="login" onclick={handle.onLogin}>로그인</button>
