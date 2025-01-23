@@ -112,6 +112,7 @@
         {#each records as record}
             <GameCard
                 {record}
+                {memberNum}
                 reloadScore={() => {
                     callApi.getScore();
                 }}

@@ -12,16 +12,27 @@
     let date = $state(dayjs().format("YYYY-MM-DD"));
     let place = $state("광교진락볼링장");
     let initScore = $state();
+    let isModify = $state(false);
 
     onMount(() => {
-        // console.log(memberNum, updateData);
-        // console.log(Object.keys(updateData));
+        isModify = Object.keys(updateData).length > 0;
+    });
+
+    $effect(() => {
+        console.log(isModify);
+        if (isModify) {
+            date = dayjs(updateData.date).format("YYYY-MM-DD");
+            place = updateData.place;
+        }
     });
 
     const handle = {
         onClkRegistGameBtn: async () => {
             await callApi.createPlayGame();
             await getScore();
+        },
+        onClkModifyGameBtn: async () => {
+            console.log("onClkModifyGameBtn");
         },
     };
 
@@ -60,12 +71,15 @@
             bind:value={place}
             placeholder="볼링장"
         />
-        <Input
-            class="mb-3"
-            type="number"
-            bind:value={initScore}
-            placeholder="점수"
-        />
+        {#if !isModify}
+            <Input
+                class="mb-3"
+                type="number"
+                bind:value={initScore}
+                placeholder="점수"
+            />
+        {/if}
+
         <div class="d-flex">
             <Button
                 class="w-50 me-2"
@@ -76,10 +90,12 @@
             />
             <Button
                 class="w-50"
-                onclick={handle.onClkRegistGameBtn}
+                onclick={isModify
+                    ? handle.onClkModifyGameBtn
+                    : handle.onClkRegistGameBtn}
                 color="primary"
                 outline
-                children="생성"
+                children={isModify ? "수정" : "생성"}
             />
         </div>
     </div>

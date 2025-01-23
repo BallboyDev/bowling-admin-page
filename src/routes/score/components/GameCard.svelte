@@ -12,7 +12,7 @@
     import RegistGame from "./RegistGame.svelte";
     import { onMount } from "svelte";
 
-    const { record, reloadScore } = $props();
+    const { record, memberNum, reloadScore } = $props();
 
     let cardMore = $state(false);
     let selectBtn = $state(false);
@@ -91,9 +91,13 @@
 
 {#if popupModify}
     <RegistGame
-        onCancel={() => {}}
-        getScore={() => {}}
-        memberNum={0}
+        onCancel={() => {
+            popupModify = false;
+        }}
+        getScore={() => {
+            reloadScore();
+        }}
+        {memberNum}
         updateData={record}
     />
 {/if}
@@ -101,7 +105,7 @@
 <div class="gameCard">
     <div class="layout">
         <div class="left">
-            <div class="place">광교진락볼링장</div>
+            <div class="place">{record.place}</div>
             <h2 class="date">
                 {dayjs(record.date).format("YYYY.MM.DD (ddd)")}
             </h2>
