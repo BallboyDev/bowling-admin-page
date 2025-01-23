@@ -7,14 +7,15 @@
     import dayjs from "dayjs";
     import { onMount } from "svelte";
 
-    let { onCancel, getScore, memberNum } = $props();
+    let { onCancel, getScore, memberNum, updateData = {} } = $props();
 
     let date = $state(dayjs().format("YYYY-MM-DD"));
     let place = $state("광교진락볼링장");
     let initScore = $state();
 
     onMount(() => {
-        console.log(memberNum);
+        // console.log(memberNum, updateData);
+        // console.log(Object.keys(updateData));
     });
 
     const handle = {
@@ -47,7 +48,10 @@
     };
 </script>
 
-<div class="popup-registGame">
+<div
+    id="popup-registGame"
+    class="position-fixed fixed-top d-flex w-100 h-100 justify-content-center align-items-center"
+>
     <div class="inputBox">
         <Input class="mb-3" type="date" valid={false} bind:value={date} />
         <Input
@@ -84,15 +88,8 @@
 <!-- <Styles /> -->
 
 <style lang="scss">
-    .popup-registGame {
+    #popup-registGame {
         z-index: 9999;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
 
         background-color: rgba(0, 0, 0, 0.4);
 

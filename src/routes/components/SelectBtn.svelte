@@ -1,27 +1,29 @@
-<!-- <SelectBtn
-        btnList={[
-            {
-                text: "취소",
-                color: "danger",
-                onClick: () => {
-                    console.log("cancel");
-                },
+<!-- 
+<SelectBtn
+    btnList={[
+        {
+            text: "취소",
+            color: "danger",
+            onClick: () => {
+                console.log("cancel");
             },
-            {
-                text: "확인",
-                color: "primary",
-                onClick: () => {
-                    console.log("confirm");
-                },
+        },
+        {
+            text: "확인",
+            color: "primary",
+            onClick: () => {
+                console.log("confirm");
             },
-        ]}
-    /> -->
+        },
+    ]}
+/> 
+-->
 <script>
     // @ts-nocheck
 
     import { Button, ButtonGroup } from "@sveltestrap/sveltestrap";
 
-    const { btnList } = $props();
+    const { text, btnList } = $props();
 </script>
 
 <div
@@ -30,7 +32,7 @@
 >
     <div class="selectBox p-3 rounded-4 d-flex flex-column">
         <div class="textBox d-flex justify-content-center align-items-center">
-            <p>이걸 진짜 삭제 할 겁니까?</p>
+            <p>{text || ""}</p>
         </div>
         <div class="d-flex">
             <ButtonGroup class="w-100">

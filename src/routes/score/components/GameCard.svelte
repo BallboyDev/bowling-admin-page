@@ -8,23 +8,32 @@
     import AddScore from "./AddScore.svelte";
     import axios from "axios";
     import { PUBLIC_API_URL } from "$env/static/public";
+    import Delete from "$lib/images/Delete.svelte";
+    import RegistGame from "./RegistGame.svelte";
+    import { onMount } from "svelte";
 
     const { record, reloadScore } = $props();
 
     let cardMore = $state(false);
-    let popupSelectBtn = $state(false);
+    let selectBtn = $state(false);
     let popupAddScore = $state(false);
+    let popupClose = $state(false);
+    let popupModify = $state(false);
+
+    onMount(() => {});
 
     const handle = {
         onClkCloseBtn: () => {
             console.log("ballboy GameCard/onClkCloseBtn()");
             cardMore = !cardMore;
-            popupSelectBtn = true;
+            selectBtn = true;
+            popupClose = true;
         },
         onClkUpdateBtn: () => {
             console.log("ballboy GameCard/onClkUpdateBtn()");
             cardMore = !cardMore;
-            popupSelectBtn = true;
+            selectBtn = true;
+            popupModify = true;
         },
     };
 
@@ -41,15 +50,27 @@
     };
 </script>
 
-{#if popupSelectBtn}
+{#if popupAddScore}
+    <AddScore
+        cardId={record.playGameId}
+        onClose={() => {
+            popupAddScore = false;
+            reloadScore();
+        }}
+    />
+{/if}
+
+{#if popupClose}
     <SelectBtn
+        text="게임을 삭제 하시겠습니까?"
         btnList={[
             {
                 text: "취소",
                 color: "danger",
                 onClick: () => {
                     console.log("cancel");
-                    popupSelectBtn = false;
+                    selectBtn = false;
+                    popupClose = false;
                 },
             },
             {
@@ -57,7 +78,8 @@
                 color: "primary",
                 onClick: async () => {
                     console.log("confirm");
-                    popupSelectBtn = false;
+                    selectBtn = false;
+                    popupClose = false;
 
                     await callApi.deletePlayGame();
                     await reloadScore();
@@ -67,13 +89,12 @@
     />
 {/if}
 
-{#if popupAddScore}
-    <AddScore
-        cardId={record.playGameId}
-        onClose={() => {
-            popupAddScore = false;
-            reloadScore();
-        }}
+{#if popupModify}
+    <RegistGame
+        onCancel={() => {}}
+        getScore={() => {}}
+        memberNum={0}
+        updateData={record}
     />
 {/if}
 
@@ -100,7 +121,7 @@
                     class="more"
                     onclick={() => {
                         handle.onClkCloseBtn();
-                    }}><Close /></button
+                    }}><Delete /></button
                 >
                 <button
                     class="more"
@@ -212,6 +233,8 @@
             }
 
             & > .addScore {
+                width: 2rem !important;
+                min-width: 2rem;
                 cursor: pointer;
             }
         }
