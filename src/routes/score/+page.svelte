@@ -40,8 +40,6 @@
         }
     });
 
-    $effect(() => {});
-
     const handle = {
         onClkHomeBtn: () => {
             if (browser) {
@@ -59,6 +57,7 @@
             await axios
                 .get(`${PUBLIC_API_URL}/bap/scoreRecord/${memberNum}`)
                 .then((res) => {
+                    console.log(res.data);
                     records = res.data;
                 });
         },

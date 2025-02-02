@@ -1,4 +1,6 @@
 <script>
+    // @ts-nocheck
+
     import Add from "$lib/images/Add.svelte";
     import Change from "$lib/images/Change.svelte";
     import Close from "$lib/images/Close.svelte";
@@ -11,6 +13,7 @@
     import Delete from "$lib/images/Delete.svelte";
     import RegistGame from "./RegistGame.svelte";
     import { onMount } from "svelte";
+    import UpdateScore from "./UpdateScore.svelte";
 
     const { record, memberNum, reloadScore } = $props();
 
@@ -19,21 +22,32 @@
     let popupAddScore = $state(false);
     let popupClose = $state(false);
     let popupModify = $state(false);
+    let popupScore = $state(false);
+
+    let selectedScore = $state({});
 
     onMount(() => {});
 
+    // $effect(() => {
+    //     if (!popupScore) {
+    //         selectedScore = {};
+    //     }
+    // });
+
     const handle = {
         onClkCloseBtn: () => {
-            console.log("ballboy GameCard/onClkCloseBtn()");
             cardMore = !cardMore;
             selectBtn = true;
             popupClose = true;
         },
         onClkUpdateBtn: () => {
-            console.log("ballboy GameCard/onClkUpdateBtn()");
             cardMore = !cardMore;
             selectBtn = true;
             popupModify = true;
+        },
+        onScoreUpdate: (score) => {
+            selectedScore = score;
+            popupScore = true;
         },
     };
 
@@ -44,7 +58,7 @@
                     `${PUBLIC_API_URL}/bap/scoreRecord/deletePlayGame/${record.playGameId}`,
                 )
                 .then((res) => {
-                    console.log(res.data);
+                    console.log(res);
                 });
         },
     };
@@ -68,7 +82,6 @@
                 text: "취소",
                 color: "danger",
                 onClick: () => {
-                    console.log("cancel");
                     selectBtn = false;
                     popupClose = false;
                 },
@@ -77,7 +90,6 @@
                 text: "확인",
                 color: "primary",
                 onClick: async () => {
-                    console.log("confirm");
                     selectBtn = false;
                     popupClose = false;
 
@@ -99,6 +111,16 @@
         }}
         {memberNum}
         updateData={record}
+    />
+{/if}
+
+{#if popupScore}
+    <UpdateScore
+        {selectedScore}
+        onCancel={() => {
+            popupScore = false;
+            reloadScore();
+        }}
     />
 {/if}
 
@@ -144,23 +166,27 @@
     <div class="scores">
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div
-            class="addScore"
+        <button
+            class="addScore score"
             onclick={() => {
                 popupAddScore = true;
             }}
         >
             <Add />
-        </div>
+        </button>
         {#each record.scores || [] as s}
-            <div>{s.score}</div>
+            <button
+                class="score"
+                onclick={() => {
+                    handle.onScoreUpdate(s);
+                }}>{s.score}</button
+            >
         {/each}
     </div>
 </div>
 
 <style lang="scss">
     .gameCard {
-        // height: 12rem;
         margin-bottom: 1rem;
         padding: 1rem;
         border: 1px solid gray;
@@ -223,7 +249,7 @@
             display: flex;
             overflow: scroll;
             margin: 0;
-            & > div {
+            & > .score {
                 height: 100%;
                 min-width: 5rem;
                 border: 1px solid gray;
@@ -234,6 +260,8 @@
                 border-radius: 0.5rem;
                 margin-right: 0.5rem;
                 background-color: #222222;
+
+                color: #cccccc;
             }
 
             & > .addScore {
