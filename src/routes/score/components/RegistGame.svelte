@@ -9,9 +9,11 @@
 
     let { onCancel, getScore, memberNum, updateData = {} } = $props();
 
+    let gameId = $state(null);
     let date = $state(dayjs().format("YYYY-MM-DD"));
     let place = $state("광교진락볼링장");
     let initScore = $state();
+    let repeatInputScore = $state(false);
     let isModify = $state(false);
 
     onMount(() => {
@@ -21,6 +23,7 @@
     $effect(() => {
         console.log(isModify);
         if (isModify) {
+            gameId = updateData.playGameId;
             date = dayjs(updateData.date).format("YYYY-MM-DD");
             place = updateData.place;
         }
@@ -33,6 +36,8 @@
         },
         onClkModifyGameBtn: async () => {
             console.log("onClkModifyGameBtn");
+            await callApi.updatePlayGame();
+            await getScore();
         },
     };
 
@@ -43,16 +48,36 @@
                 return;
             }
 
+            // await axios
+            //     .post(`${PUBLIC_API_URL}/bap/scoreRecord/registGame`, {
+            //         date,
+            //         place,
+            //         type: "0",
+            //         memberNum,
+            //         initScore,
+            //     })
+            //     .then((res) => {
+            //         console.log(res.data);
+            //     });
+            onCancel();
+        },
+        updatePlayGame: async () => {
+            if (!date || !place) {
+                alert("입력 값을 확인해 주세요");
+                return;
+            }
+
             await axios
-                .post(`${PUBLIC_API_URL}/bap/scoreRecord/registGame`, {
+                .post(`${PUBLIC_API_URL}/bap/scoreRecord/updateGame`, {
+                    id: gameId,
                     date,
                     place,
-                    type: "0",
-                    memberNum,
-                    initScore,
                 })
                 .then((res) => {
                     console.log(res.data);
+                    gameId = null;
+                    date = null;
+                    place = null;
                 });
             onCancel();
         },
@@ -72,6 +97,12 @@
             placeholder="볼링장"
         />
         {#if !isModify}
+            <Input
+                class="mb-3"
+                type="checkbox"
+                label="점수 연속 입력"
+                bind:checked={repeatInputScore}
+            />
             <Input
                 class="mb-3"
                 type="number"
