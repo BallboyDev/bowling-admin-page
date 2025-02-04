@@ -18,14 +18,20 @@
 
     const handle = {
         onLogin: () => {
-            console.log("onLogin()");
-            console.log("정보 입력 필터 기능");
             if (name === "" || memberNum === "") {
                 alert("로그인 정보를 입력해주세요");
+                return;
             }
             callApi.login();
         },
-        onJoin: () => {},
+        onJoin: async () => {
+            if (name === "" || memberNum === "") {
+                alert("회원가입 정보를 입력해주세요");
+                return;
+            }
+
+            await callApi.join();
+        },
     };
 
     const callApi = {
@@ -48,6 +54,18 @@
                     }
                 });
         },
+        join: async () => {
+            await axios
+                .post(`${PUBLIC_API_URL}/bap/join`, {
+                    name,
+                    num: memberNum,
+                })
+                .then((res) => {
+                    if (res.data.state === "duplicate") {
+                        alert("중복된 계정이 있습니다.");
+                    }
+                });
+        },
     };
 </script>
 
@@ -56,7 +74,7 @@
         <input type="text" placeholder="이름" bind:value={name} />
         <input type="text" placeholder="회원 번호" bind:value={memberNum} />
         <div class="btnBox">
-            <button class="join">회원가입</button>
+            <button class="join" onclick={handle.onJoin}>회원가입</button>
             <button class="login" onclick={handle.onLogin}>로그인</button>
         </div>
     </div>

@@ -48,17 +48,17 @@
                 return;
             }
 
-            // await axios
-            //     .post(`${PUBLIC_API_URL}/bap/scoreRecord/registGame`, {
-            //         date,
-            //         place,
-            //         type: "0",
-            //         memberNum,
-            //         initScore,
-            //     })
-            //     .then((res) => {
-            //         console.log(res.data);
-            //     });
+            await axios
+                .post(`${PUBLIC_API_URL}/bap/scoreRecord/registGame`, {
+                    date,
+                    place,
+                    type: "0",
+                    memberNum,
+                    initScore,
+                })
+                .then((res) => {
+                    console.log(res.data);
+                });
             onCancel();
         },
         updatePlayGame: async () => {
