@@ -12,7 +12,7 @@
     let gameId = $state(null);
     let date = $state(dayjs().format("YYYY-MM-DD"));
     let place = $state("광교진락볼링장");
-    let initScore = $state();
+    let inputScoreList = $state([null]); // 반복
     let repeatInputScore = $state(false);
     let isModify = $state(false);
 
@@ -30,37 +30,17 @@
     });
 
     const handle = {
-        onClkRegistGameBtn: async () => {
+        onRegistGameBtn: async () => {
             await callApi.createPlayGame();
             await getScore();
         },
         onClkModifyGameBtn: async () => {
-            console.log("onClkModifyGameBtn");
             await callApi.updatePlayGame();
             await getScore();
         },
     };
 
     const callApi = {
-        createPlayGame: async () => {
-            if (!date || !place || !initScore || initScore === 0) {
-                alert("입력 값을 확인해 주세요");
-                return;
-            }
-
-            await axios
-                .post(`${PUBLIC_API_URL}/bap/scoreRecord/registGame`, {
-                    date,
-                    place,
-                    type: "0",
-                    memberNum,
-                    initScore,
-                })
-                .then((res) => {
-                    console.log(res.data);
-                });
-            onCancel();
-        },
         updatePlayGame: async () => {
             if (!date || !place) {
                 alert("입력 값을 확인해 주세요");
@@ -81,6 +61,34 @@
                 });
             onCancel();
         },
+
+        createPlayGame: async () => {
+            if (
+                !date ||
+                !place ||
+                inputScoreList.length === 0 ||
+                inputScoreList.reduce((a, c) => {
+                    return a + c;
+                }, 0) <= 0
+            ) {
+                console.log("");
+                alert("입력 값을 확인해 주세요");
+                return;
+            }
+
+            await axios
+                .post(`${PUBLIC_API_URL}/bap/scoreRecord/registGame`, {
+                    date,
+                    place,
+                    type: "0",
+                    memberNum,
+                    inputScoreList,
+                })
+                .then((res) => {
+                    console.log(res.data);
+                });
+            onCancel();
+        },
     };
 </script>
 
@@ -97,17 +105,30 @@
             placeholder="볼링장"
         />
         {#if !isModify}
-            <Input
-                class="mb-3"
-                type="checkbox"
-                label="점수 연속 입력"
-                bind:checked={repeatInputScore}
-            />
-            <Input
-                class="mb-3"
-                type="number"
-                bind:value={initScore}
-                placeholder="점수"
+            <div class="inputScore">
+                {#each inputScoreList as score, i}
+                    <div class="d-flex">
+                        <Button class="mb-3" children={i + 1} />
+                        <Input
+                            class="mb-3"
+                            type="number"
+                            placeholder="점수"
+                            bind:value={inputScoreList[i]}
+                        />
+                    </div>
+                {/each}
+            </div>
+            <Button
+                class="mb-3 w-100"
+                color="primary"
+                children="점수 추가"
+                onclick={() => {
+                    const lastScore = inputScoreList[inputScoreList.length - 1];
+
+                    if ((lastScore || 0) > 0 && (lastScore || 0) <= 300) {
+                        inputScoreList = [...inputScoreList, null];
+                    }
+                }}
             />
         {/if}
 
@@ -123,7 +144,7 @@
                 class="w-50"
                 onclick={isModify
                     ? handle.onClkModifyGameBtn
-                    : handle.onClkRegistGameBtn}
+                    : handle.onRegistGameBtn}
                 color="primary"
                 outline
                 children={isModify ? "수정" : "생성"}
@@ -148,6 +169,11 @@
             border-radius: 1rem;
 
             background-color: #222222;
+
+            & > .inputScore {
+                max-height: 15rem;
+                overflow-x: auto;
+            }
         }
     }
 </style>
