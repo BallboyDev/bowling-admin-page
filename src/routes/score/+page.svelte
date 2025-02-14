@@ -52,7 +52,6 @@
             await axios
                 .get(`${PUBLIC_API_URL}/bap/scoreRecord/${memberNum}`)
                 .then((res) => {
-                    console.log(res.data);
                     records = res.data;
                 });
         },
@@ -71,9 +70,18 @@
     />
 {/if}
 
-<div id="tempPage">
+<div id="scorePage">
     <Title
+        {memberName}
+        {memberNum}
         navi={[
+            {
+                title: "분석",
+                icon: Controller,
+                onClick: () => {
+                    location.href = "/total";
+                },
+            },
             {
                 title: "필터",
                 icon: Controller,
@@ -85,11 +93,6 @@
                 onClick: () => {
                     handle.onClkRegistGameBtn();
                 },
-            },
-            {
-                title: "회원정보수정",
-                icon: UserInfo,
-                onClick: () => {},
             },
         ]}
     />
@@ -109,7 +112,7 @@
 </div>
 
 <style lang="scss">
-    #tempPage {
+    #scorePage {
         width: 100%;
         max-width: 576px;
         height: 100vh;

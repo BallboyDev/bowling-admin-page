@@ -3,26 +3,14 @@
 
     import { browser } from "$app/environment";
     import Home from "$lib/images/Home.svelte";
+    import Menu from "$lib/images/Menu.svelte";
     import { onMount } from "svelte";
 
-    let { navi } = $props();
-
-    let userInfo = $state("");
-    let memberName = $derived(userInfo.split("/")[0]);
-    let memberNum = $derived(userInfo.split("/")[1]);
+    let { navi, memberName = "tester", memberNum = "0000" } = $props();
 
     let popupRegistGame = $state(false);
 
-    onMount(() => {
-        if (browser) {
-            userInfo = localStorage.getItem("userInfo");
-        }
-
-        if (!userInfo) {
-            location.href = "/";
-        } else {
-        }
-    });
+    onMount(() => {});
 
     const handle = {
         onClkHomeBtn: () => {
@@ -53,6 +41,9 @@
             <button class="navi" onclick={n.onClick}>
                 {#if !!n.icon}
                     {@const Component = n.icon}
+                    <Component />&nbsp;{n.title}
+                {:else}
+                    {@const Component = Menu}
                     <Component />&nbsp;{n.title}
                 {/if}
             </button>

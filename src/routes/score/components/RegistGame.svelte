@@ -2,10 +2,16 @@
     // @ts-nocheck
 
     import { PUBLIC_API_URL } from "$env/static/public";
-    import { Button, Input } from "@sveltestrap/sveltestrap";
+    import {
+        Button,
+        Input,
+        InputGroup,
+        InputGroupText,
+    } from "@sveltestrap/sveltestrap";
     import axios from "axios";
     import dayjs from "dayjs";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
+    import { on } from "svelte/events";
 
     let { onCancel, getScore, memberNum, updateData = {} } = $props();
 
@@ -20,12 +26,20 @@
         isModify = Object.keys(updateData).length > 0;
     });
 
+    onDestroy(() => {
+        keyListener(); // 이벤트 해제
+    });
+
     $effect(() => {
         if (isModify) {
             gameId = updateData.playGameId;
             date = dayjs(updateData.date).format("YYYY-MM-DD");
             place = updateData.place;
         }
+    });
+
+    const keyListener = on(window, "keydown", (e) => {
+        // console.log("ballboy >>", e.key, e.code);
     });
 
     const handle = {
@@ -104,21 +118,14 @@
         {#if !isModify}
             <div class="inputScore">
                 {#each inputScoreList as score, i}
-                    <div class="d-flex">
-                        <Button
-                            class="mb-3 rounded-end"
-                            color="light"
-                            disabled
-                            outline
-                            children={i + 1}
-                        />
+                    <InputGroup class="mb-3">
+                        <InputGroupText>{i + 1}</InputGroupText>
                         <Input
-                            class="mb-3"
                             type="number"
                             placeholder="점수"
                             bind:value={inputScoreList[i]}
                         />
-                    </div>
+                    </InputGroup>
                 {/each}
             </div>
             <Button
