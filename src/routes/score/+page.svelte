@@ -20,6 +20,7 @@
     import Close from "$lib/images/Close.svelte";
     import GameCard from "./components/GameCard.svelte";
     import SelectBtn from "../components/SelectBtn.svelte";
+    import Title from "../components/Title.svelte";
 
     let records = $state({});
     let popupRegistGame = $state(false);
@@ -41,12 +42,6 @@
     });
 
     const handle = {
-        onClkHomeBtn: () => {
-            if (browser) {
-                localStorage.removeItem("userInfo");
-                location.href = "/";
-            }
-        },
         onClkRegistGameBtn: () => {
             popupRegistGame = true;
         },
@@ -77,34 +72,27 @@
 {/if}
 
 <div id="tempPage">
-    <div class="title">
-        <h1>{memberName} ({memberNum})</h1>
-    </div>
-
-    <div class="navigator">
-        <button
-            class="navi"
-            onclick={() => {
-                handle.onClkHomeBtn();
-            }}
-        >
-            <Home />&nbsp;홈
-        </button>
-        <button class="navi">
-            <Controller />&nbsp;필터
-        </button>
-        <button
-            class="navi"
-            onclick={() => {
-                handle.onClkRegistGameBtn();
-            }}
-        >
-            <Dashboard />&nbsp;게임등록
-        </button>
-        <button class="navi">
-            <UserInfo />&nbsp;회원정보수정
-        </button>
-    </div>
+    <Title
+        navi={[
+            {
+                title: "필터",
+                icon: Controller,
+                onClick: () => {},
+            },
+            {
+                title: "게임등록",
+                icon: Dashboard,
+                onClick: () => {
+                    handle.onClkRegistGameBtn();
+                },
+            },
+            {
+                title: "회원정보수정",
+                icon: UserInfo,
+                onClick: () => {},
+            },
+        ]}
+    />
 
     <div class="contents">
         <!-- 일시, 장소, 총점, 평균, 메모 -->
@@ -130,35 +118,6 @@
 
         & * {
             scrollbar-width: none;
-        }
-
-        & > .title {
-            padding: 1rem 0;
-            margin: 0 1rem;
-        }
-
-        & > .navigator {
-            display: flex;
-            overflow-x: auto;
-            height: 3rem;
-            margin: 0 0.5rem;
-
-            & > .navi {
-                padding: 0 1.5rem;
-                text-align: center;
-                border: 1px solid gray;
-                border-radius: 1.5rem;
-                white-space: nowrap;
-                margin: 0 0.25rem;
-
-                display: flex;
-                align-items: center;
-
-                color: white;
-                font-size: 1rem;
-
-                background-color: #282828;
-            }
         }
 
         & > .contents {

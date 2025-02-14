@@ -1,41 +1,97 @@
 <script>
     // @ts-nocheck
 
-    import { setMember } from "../lib/store/store";
+    import { browser } from "$app/environment";
+    import Home from "$lib/images/Home.svelte";
+    import { onMount } from "svelte";
 
-    const { title } = $props();
-    let member = $state({});
+    let { navi } = $props();
 
-    setMember.subscribe((value) => {
-        member = value;
+    let userInfo = $state("");
+    let memberName = $derived(userInfo.split("/")[0]);
+    let memberNum = $derived(userInfo.split("/")[1]);
+
+    let popupRegistGame = $state(false);
+
+    onMount(() => {
+        if (browser) {
+            userInfo = localStorage.getItem("userInfo");
+        }
+
+        if (!userInfo) {
+            location.href = "/";
+        } else {
+        }
     });
+
+    const handle = {
+        onClkHomeBtn: () => {
+            if (browser) {
+                localStorage.removeItem("userInfo");
+                location.href = "/";
+            }
+        },
+    };
 </script>
 
 <div class="title">
-    {#if !!member.name}
-        <h1>{title} - {member?.name}</h1>
-    {:else}
-        <h1>{title}</h1>
-    {/if}
-    <a href="/">home</a>
+    <div class="userInfo">
+        <h1>{memberName} ({memberNum})</h1>
+    </div>
+
+    <div class="navigator">
+        <button
+            class="navi"
+            onclick={() => {
+                handle.onClkHomeBtn();
+            }}
+        >
+            <Home />&nbsp;홈
+        </button>
+
+        {#each navi as n, i}
+            <button class="navi" onclick={n.onClick}>
+                {#if !!n.icon}
+                    {@const Component = n.icon}
+                    <Component />&nbsp;{n.title}
+                {/if}
+            </button>
+        {/each}
+    </div>
 </div>
 
-<hr />
-
-<style>
+<style lang="scss">
     .title {
-        margin: 1rem;
-        display: flex;
-        align-items: end;
-        justify-content: space-between;
-
-        & > h1 {
-            margin-right: 1rem;
+        & * {
+            scrollbar-width: none;
+        }
+        & > .userInfo {
+            padding: 1rem 0;
+            margin: 0 1rem;
         }
 
-        & > a {
-            text-decoration: none;
-            color: #cccccc;
+        & > .navigator {
+            display: flex;
+            overflow-x: auto;
+            height: 3rem;
+            margin: 0 0.5rem;
+
+            & > .navi {
+                padding: 0 1.5rem;
+                text-align: center;
+                border: 1px solid gray;
+                border-radius: 1.5rem;
+                white-space: nowrap;
+                margin: 0 0.25rem;
+
+                display: flex;
+                align-items: center;
+
+                color: white;
+                font-size: 1rem;
+
+                background-color: #282828;
+            }
         }
     }
 </style>

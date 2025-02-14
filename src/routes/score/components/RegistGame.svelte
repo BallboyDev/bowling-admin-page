@@ -12,7 +12,7 @@
     let gameId = $state(null);
     let date = $state(dayjs().format("YYYY-MM-DD"));
     let place = $state("광교진락볼링장");
-    let inputScoreList = $state([null]); // 반복
+    let inputScoreList = $state([null]);
     let repeatInputScore = $state(false);
     let isModify = $state(false);
 
@@ -21,7 +21,6 @@
     });
 
     $effect(() => {
-        console.log(isModify);
         if (isModify) {
             gameId = updateData.playGameId;
             date = dayjs(updateData.date).format("YYYY-MM-DD");
@@ -54,7 +53,6 @@
                     place,
                 })
                 .then((res) => {
-                    console.log(res.data);
                     gameId = null;
                     date = null;
                     place = null;
@@ -71,7 +69,6 @@
                     return a + c;
                 }, 0) <= 0
             ) {
-                console.log("");
                 alert("입력 값을 확인해 주세요");
                 return;
             }
@@ -108,7 +105,13 @@
             <div class="inputScore">
                 {#each inputScoreList as score, i}
                     <div class="d-flex">
-                        <Button class="mb-3" children={i + 1} />
+                        <Button
+                            class="mb-3 rounded-end"
+                            color="light"
+                            disabled
+                            outline
+                            children={i + 1}
+                        />
                         <Input
                             class="mb-3"
                             type="number"
