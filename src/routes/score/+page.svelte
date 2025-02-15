@@ -21,6 +21,7 @@
     import GameCard from "./components/GameCard.svelte";
     import SelectBtn from "../components/SelectBtn.svelte";
     import Title from "../components/Title.svelte";
+    import ChartArrowBottomRight from "$lib/images/ChartArrowBottomRight.svelte";
 
     let records = $state({});
     let popupRegistGame = $state(false);
@@ -77,7 +78,7 @@
         navi={[
             {
                 title: "분석",
-                icon: Controller,
+                icon: ChartArrowBottomRight,
                 onClick: () => {
                     location.href = "/total";
                 },
