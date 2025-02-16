@@ -124,7 +124,7 @@
     />
 {/if}
 
-<div class="gameCard">
+<div id="gameCard">
     <div class="layout">
         <div class="left">
             <div class="place">{record.place}</div>
@@ -186,7 +186,7 @@
 </div>
 
 <style lang="scss">
-    .gameCard {
+    #gameCard {
         margin-bottom: 1rem;
         padding: 1rem;
         border: 1px solid gray;

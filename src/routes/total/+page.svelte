@@ -6,7 +6,10 @@
     import Dashboard from "$lib/images/Dashboard.svelte";
     import UserInfo from "$lib/images/UserInfo.svelte";
     import Controller from "$lib/images/Controller.svelte";
-    import { browser } from "$app/environment";
+    import { browser, building, dev, version } from "$app/environment";
+    import Card from "./components/Period.svelte";
+    import Period from "./components/Period.svelte";
+    import Place from "./components/Place.svelte";
 
     // props, state value
     let userInfo = $state("");
@@ -54,9 +57,11 @@
         ]}
     />
 
-    <div class="contents">
+    <div class="contents m-3">
         <!-- 기간(일, 주, 월) 별 점수 통계 -->
+        <Period />
         <!-- 볼링장 별 통계 -->
+        <Place />
         <!-- 특별 기록 (최고점, 올커버, 700시리즈, 800시리즈, 퍼펙트, ) -->
     </div>
 </div>
