@@ -6,13 +6,9 @@
     import { onMount } from "svelte";
 
     // props, state value
-    let ctx;
-    let chartCanvas = $state(null);
-
-    Chart.register(...registerables);
 
     onMount(() => {
-        ctx = document.getElementById("myChart");
+        let ctx = document.getElementById("periodChart");
         new Chart(ctx, {
             type: "line",
             data: {
@@ -28,7 +24,7 @@
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true,
+                        beginAtZero: false,
                     },
                 },
                 plugins: {
@@ -49,7 +45,7 @@
         <Button color="primary" size="sm" children="월" />
         <Button color="primary" size="sm" children="년" />
     </ButtonGroup>
-    <canvas bind:this={chartCanvas} id="myChart"></canvas>
+    <canvas id="periodChart"></canvas>
 </div>
 
 <style lang="scss">

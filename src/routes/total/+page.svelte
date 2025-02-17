@@ -10,12 +10,14 @@
     import Card from "./components/Period.svelte";
     import Period from "./components/Period.svelte";
     import Place from "./components/Place.svelte";
+    import { Chart, registerables } from "chart.js";
 
     // props, state value
     let userInfo = $state("");
     let memberName = $derived(userInfo.split("/")[0]);
     let memberNum = $derived(userInfo.split("/")[1]);
 
+    Chart.register(...registerables);
     onMount(() => {
         if (browser) {
             userInfo = localStorage.getItem("userInfo");
