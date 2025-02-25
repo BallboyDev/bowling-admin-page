@@ -11,6 +11,7 @@
     import Period from "./components/Period.svelte";
     import Place from "./components/Place.svelte";
     import { Chart, registerables } from "chart.js";
+    import RecordBadge from "./components/RecordBadge.svelte";
 
     // props, state value
     let userInfo = $state("");
@@ -65,6 +66,7 @@
         <!-- 볼링장 별 통계 -->
         <Place />
         <!-- 특별 기록 (최고점, 올커버, 700시리즈, 800시리즈, 퍼펙트, ) -->
+        <RecordBadge />
     </div>
 </div>
 
