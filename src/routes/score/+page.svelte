@@ -22,9 +22,11 @@
     import SelectBtn from "../components/SelectBtn.svelte";
     import Title from "../components/Title.svelte";
     import ChartArrowBottomRight from "$lib/images/ChartArrowBottomRight.svelte";
+    import FilterScore from "../components/FilterScore.svelte";
 
     let records = $state({});
     let popupRegistGame = $state(false);
+    let filterScore = $state(true);
 
     let userInfo = $state("");
     let memberName = $derived(userInfo.split("/")[0]);
@@ -71,6 +73,14 @@
     />
 {/if}
 
+{#if filterScore}
+    <FilterScore
+        onClose={() => {
+            filterScore = false;
+        }}
+    />
+{/if}
+
 <div id="scorePage">
     <Title
         {memberName}
@@ -86,7 +96,9 @@
             {
                 title: "필터",
                 icon: Controller,
-                onClick: () => {},
+                onClick: () => {
+                    filterScore = true;
+                },
             },
             {
                 title: "게임등록",

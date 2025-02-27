@@ -8,14 +8,14 @@
     // props, state value
 
     onMount(() => {
-        let ctx = document.getElementById("periodChart");
+        let ctx = document.getElementById(`periodChart`);
         new Chart(ctx, {
             type: "line",
             data: {
                 labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
                 datasets: [
                     {
-                        label: "# of Votes",
+                        label: "",
                         data: [12, 19, 3, 5, 2, 3],
                         borderWidth: 1,
                     },
@@ -29,6 +29,9 @@
                 },
                 plugins: {
                     tooltip: false,
+                    legend: {
+                        display: false,
+                    },
                 },
             },
         });
@@ -45,7 +48,7 @@
         <Button color="primary" size="sm" children="월" />
         <Button color="primary" size="sm" children="년" />
     </ButtonGroup>
-    <canvas id="periodChart"></canvas>
+    <canvas id={`periodChart`}></canvas>
 </div>
 
 <style lang="scss">

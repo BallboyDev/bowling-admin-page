@@ -23,8 +23,9 @@
 </script>
 
 <div class="title">
-    <div class="userInfo">
+    <div class="userInfo d-flex justify-content-between align-items-center">
         <h1>{memberName} ({memberNum})</h1>
+        <Menu />
     </div>
 
     <div class="navigator">
