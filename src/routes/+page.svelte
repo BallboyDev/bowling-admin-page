@@ -1,6 +1,7 @@
 <script>
     import { browser } from "$app/environment";
     import { PUBLIC_API_URL } from "$env/static/public";
+    import { getStorage, setStorage } from "$lib/localStorage.svelte";
     import axios from "axios";
     import { onMount } from "svelte";
 
@@ -8,11 +9,17 @@
     let memberNum = $state("");
 
     onMount(() => {
-        if (browser) {
-            const userInfo = localStorage.getItem("userInfo");
-            if (!!userInfo) {
-                location.href = "/score";
-            }
+        // if (browser) {
+        //     const userInfo = localStorage.getItem("userInfo");
+
+        //     if (!!userInfo) {
+        //         location.href = "/score";
+        //     }
+        // }
+
+        const userInfo = getStorage("userInfo");
+        if (!!userInfo) {
+            location.href = "/score";
         }
     });
 
@@ -43,8 +50,12 @@
                 .then((res) => {
                     const userInfo = res.data;
 
-                    if (userInfo.length > 0 && browser) {
-                        localStorage.setItem(
+                    if (userInfo.length > 0 /* && browser */) {
+                        // localStorage.setItem(
+                        //     "userInfo",
+                        //     `${userInfo[0].name}/${userInfo[0].memberNum}`,
+                        // );
+                        setStorage(
                             "userInfo",
                             `${userInfo[0].name}/${userInfo[0].memberNum}`,
                         );

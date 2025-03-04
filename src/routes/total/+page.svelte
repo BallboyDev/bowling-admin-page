@@ -20,9 +20,10 @@
 
     Chart.register(...registerables);
     onMount(() => {
-        if (browser) {
-            userInfo = localStorage.getItem("userInfo");
-        }
+        // if (browser) {
+        //     userInfo = localStorage.getItem("userInfo");
+        // }
+        userInfo = getStorage("userInfo");
 
         if (!userInfo) {
             location.href = "/";

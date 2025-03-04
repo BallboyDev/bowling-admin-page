@@ -23,19 +23,22 @@
     import Title from "../components/Title.svelte";
     import ChartArrowBottomRight from "$lib/images/ChartArrowBottomRight.svelte";
     import FilterScore from "../components/FilterScore.svelte";
+    import { getStorage } from "$lib/localStorage.svelte";
 
     let records = $state({});
     let popupRegistGame = $state(false);
-    let filterScore = $state(true);
+    let filterScore = $state(false);
 
     let userInfo = $state("");
     let memberName = $derived(userInfo.split("/")[0]);
     let memberNum = $derived(userInfo.split("/")[1]);
 
     onMount(() => {
-        if (browser) {
-            userInfo = localStorage.getItem("userInfo");
-        }
+        // if (browser) {
+        //     userInfo = localStorage.getItem("userInfo");
+        // }
+
+        userInfo = getStorage("userInfo");
 
         if (!userInfo) {
             location.href = "/";

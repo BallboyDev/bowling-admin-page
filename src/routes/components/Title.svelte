@@ -4,6 +4,7 @@
     import { browser } from "$app/environment";
     import Home from "$lib/images/Home.svelte";
     import Menu from "$lib/images/Menu.svelte";
+    import { removeStorage } from "$lib/localStorage.svelte";
     import { onMount } from "svelte";
 
     let { navi, memberName = "tester", memberNum = "0000" } = $props();
@@ -14,10 +15,13 @@
 
     const handle = {
         onClkHomeBtn: () => {
-            if (browser) {
-                localStorage.removeItem("userInfo");
-                location.href = "/";
-            }
+            // if (browser) {
+            //     localStorage.removeItem("userInfo");
+            //     location.href = "/";
+            // }
+
+            removeStorage("userInfo");
+            location.href = "/";
         },
     };
 </script>
