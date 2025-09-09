@@ -1,6 +1,7 @@
 <script lang="ts">
     import Betting from "$lib/components/Betting.svelte";
     import EventScore from "$lib/components/EventScore.svelte";
+    import Login from "$lib/components/Login.svelte";
     import Notice from "$lib/components/Notice.svelte";
     import ScoreTable from "$lib/components/ScoreTable.svelte";
     import type { PageProps } from "./$types";
@@ -8,7 +9,7 @@
     let { data }: PageProps = $props();
 </script>
 
-<h1>개빡세 X월 X주차 정기전</h1>
+<Login />
 
 <div class="content">
     <div class="score">
@@ -29,9 +30,6 @@
 </div>
 
 <style lang="scss">
-    h1 {
-        margin-bottom: 1rem;
-    }
     .content {
         display: flex;
         flex-direction: column;

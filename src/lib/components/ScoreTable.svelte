@@ -16,17 +16,21 @@
     <thead>
         <tr>
             <th>이름</th>
-            <th>첫번째 게임</th>
-            <th>두번째 게임</th>
-            <th>세번째 게임</th>
-            <th>네번째 게임</th>
+            <th>Game 1</th>
+            <th>Game 2</th>
+            <th>Game 3</th>
+            <th>Game 4</th>
             <th>평균 점수</th>
         </tr>
     </thead>
     <tbody>
         {#each scores.players as score}
             <tr>
-                <th>{score.name}</th>
+                <th class={score.team ? "down" : "up"}
+                    >{score.handicap > 0
+                        ? `${score.name} / +${score.handicap}`
+                        : score.name}</th
+                >
                 <td> {score.score1}</td>
                 <td> {score.score2}</td>
                 <td> {score.score3}</td>
@@ -56,6 +60,13 @@
     }
     tr {
         height: calc(100% / 12);
+
+        & > .up {
+            color: red;
+        }
+        & > .down {
+            color: blue;
+        }
     }
 
     td {

@@ -23,7 +23,8 @@ export const actions: Actions = {
         console.log(member)
 
         const saveData = {
-            date: dayjs(date?.toString()).add(9, 'h').toDate(),
+            // date: dayjs(date?.toString()).add(9, 'h').toDate(),
+            date: dayjs('2025-01-01').toDate(),
             name: name,
             handicap: !!member && member.gender ? 15 : 0,
             guest: !member
