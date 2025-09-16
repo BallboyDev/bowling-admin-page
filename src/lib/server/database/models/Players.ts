@@ -1,7 +1,9 @@
 import mongoose, { Schema, model } from "mongoose";
+import Members from "./Members";
 
 const playerSchema = new Schema({
     date: { type: Date, default: Date.now },
+    memberId: { type: Schema.Types.ObjectId, ref: Members },
     name: { type: String, required: true },
     score1: { type: Number, default: 0 },
     score2: { type: Number, default: 0 },

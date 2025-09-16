@@ -2,7 +2,7 @@ import mongoose, { model, Schema } from "mongoose";
 
 const memberSchema = new Schema({
     name: { type: String, required: true },
-    password: { type: Number, required: true },
+    password: { type: String, required: true },
     gender: { type: Boolean, default: false }, // false : M / true : W
     tel: { type: String },
     records: { type: Array },

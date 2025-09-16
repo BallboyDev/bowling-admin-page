@@ -26,11 +26,11 @@
     <tbody>
         {#each scores.players as score}
             <tr>
-                <th class={score.team ? "down" : "up"}
-                    >{score.handicap > 0
+                <th class={score.team ? "down" : "up"}>
+                    {score.handicap > 0
                         ? `${score.name} / +${score.handicap}`
-                        : score.name}</th
-                >
+                        : score.name}
+                </th>
                 <td> {score.score1}</td>
                 <td> {score.score2}</td>
                 <td> {score.score3}</td>

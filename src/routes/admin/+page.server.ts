@@ -25,6 +25,7 @@ export const actions: Actions = {
         const saveData = {
             // date: dayjs(date?.toString()).add(9, 'h').toDate(),
             date: dayjs('2025-01-01').toDate(),
+            memberId: member?._id || null,
             name: name,
             handicap: !!member && member.gender ? 15 : 0,
             guest: !member
