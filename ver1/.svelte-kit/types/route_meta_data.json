@@ -1,0 +1,10 @@
+{
+	"/": [
+		"src/routes/+page.ts",
+		"src/routes/+page.server.ts",
+		"src/routes/+server.ts"
+	],
+	"/admin": [
+		"src/routes/admin/+page.server.ts"
+	]
+}
