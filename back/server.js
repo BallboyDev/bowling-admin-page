@@ -1,0 +1,60 @@
+const express = require('express');
+const path = require('path');
+const dotenv = require('dotenv')
+
+const multer = require('multer')
+
+const app = express();
+const port = process.env.PORT || 3000;
+const frontendDistPath = path.resolve(__dirname, '../front/dist');
+
+const db = require('./database/db');
+
+dotenv.config()
+
+// const upload = multer({
+//     storage: multer.diskStorage({
+//         destination(req, file, next) {
+//             next(null, "upload/")
+//         },
+//         filename(req, file, next) {
+//             const ext = path.extname(file.originalname);
+//             next(null, path.basename(file.originalname, ext) + new Date().valueOf() + ext)
+//         }
+//     }),
+//     limits: { fileSize: 10 * 1024 * 1024 }
+// })
+
+// Serve the built frontend assets.
+app.use(express.static(frontendDistPath));
+
+// Middleware to parse JSON requests
+app.use(express.json());
+
+
+
+app.use('/', (req, res, next) => {
+    console.log(req.method, req.url);
+    next()
+})
+
+app.get('/test', (req, res) => {
+    res.send('Test route');
+});
+
+app.use('/api', require('./routes'));
+
+// Support client-side routing by returning the frontend entry point
+// for GET requests that did not match a static file or API route.
+app.use((req, res, next) => {
+    if (req.method !== 'GET') {
+        return next();
+    }
+
+    return res.sendFile(path.join(frontendDistPath, 'index.html'));
+});
+
+// Start the server
+app.listen(port, '::', () => {
+    console.log(`Server is running on http://localhost:${port}`);
+}); 
