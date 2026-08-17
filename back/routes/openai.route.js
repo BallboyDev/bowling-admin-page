@@ -1,30 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const multer = require('multer')
 
 const openaiService = require('./openai.service')
-
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-        fileSize: 10 * 1024 * 1024,
-    },
-    fileFilter(req, file, next) {
-        const allowedTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-        ];
-
-        if (!allowedTypes.includes(file.mimetype)) {
-            return next(new Error("지원하지 않는 이미지 형식입니다."));
-        }
-
-        next(null, true);
-    },
-});
-
-
+const membersService = require('./members.service')
+// const imagesService = require('./images.service')
+const { uploadMemory } = require('./images.service')
 
 router.post('/', async (req, res) => {
 
@@ -34,10 +14,29 @@ router.post('/', async (req, res) => {
     res.json(result)
 })
 
-router.post('/upload', upload.single("image"), async (req, res) => {
-    const result = await openaiService.upload(req, res)
+router.post('/analysis', uploadMemory.single("image"), async (req, res) => {
+    try {
 
-    res.json(result)
+        const file = req.file
+
+
+
+        // 1. memberList 조회
+        const temp = await membersService.members()
+        const memberList = temp.map((v) => {
+            console.log(v)
+            return v.name
+        })
+
+        // 2. 이미지 분석
+        const analysis = await openaiService.imageAnalysis(file, memberList)
+
+        res.json(analysis)
+
+    } catch (err) {
+        console.error(err)
+        res.status(500).json(err)
+    }
 })
 
 module.exports = router

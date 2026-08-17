@@ -12,19 +12,6 @@ const db = require('./database/db');
 
 dotenv.config()
 
-// const upload = multer({
-//     storage: multer.diskStorage({
-//         destination(req, file, next) {
-//             next(null, "upload/")
-//         },
-//         filename(req, file, next) {
-//             const ext = path.extname(file.originalname);
-//             next(null, path.basename(file.originalname, ext) + new Date().valueOf() + ext)
-//         }
-//     }),
-//     limits: { fileSize: 10 * 1024 * 1024 }
-// })
-
 // Serve the built frontend assets.
 app.use(express.static(frontendDistPath));
 

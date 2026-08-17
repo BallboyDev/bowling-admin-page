@@ -1,6 +1,6 @@
 const db = require('../database/db');
 
-const members = async (req, res) => {
+const members = async () => {
 
     console.log('members')
     const result = db.prepare('select * from members order by auth ').all();

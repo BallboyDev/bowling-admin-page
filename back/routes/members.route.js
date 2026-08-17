@@ -5,7 +5,7 @@ const memberService = require('./members.service')
 
 // 전체 회원 리스트
 router.get('/', async (req, res) => {
-    const result = await memberService.members(req, res)
+    const result = await memberService.members()
 
     res.json(result)
 })
