@@ -70,6 +70,7 @@
         </Column>
         <Column header="전화번호">{row?.["phone"]}</Column>
         <Column header="스타일">{row?.["style"]}</Column>
+        <Column header="핸디">{row?.["handicap"]}</Column>
         <Column header="생년월일">{row?.["birth"]}</Column>
     </Table>
 </div>

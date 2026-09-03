@@ -1,0 +1,234 @@
+{
+    "action": {
+        "players": [
+            {
+                "name": "전형서",
+                "game1": {
+                    "score": 166,
+                    "confidence": 98
+                },
+                "game2": {
+                    "score": 145,
+                    "confidence": 96
+                },
+                "game3": {
+                    "score": 179,
+                    "confidence": 95
+                },
+                "game4": {
+                    "score": 170,
+                    "confidence": 96
+                }
+            },
+            {
+                "name": "최민우",
+                "game1": {
+                    "score": 156,
+                    "confidence": 97
+                },
+                "game2": {
+                    "score": 195,
+                    "confidence": 95
+                },
+                "game3": {
+                    "score": 143,
+                    "confidence": 72
+                },
+                "game4": {
+                    "score": 150,
+                    "confidence": 94
+                }
+            },
+            {
+                "name": "정귀진",
+                "game1": {
+                    "score": 140,
+                    "confidence": 94
+                },
+                "game2": {
+                    "score": 168,
+                    "confidence": 95
+                },
+                "game3": {
+                    "score": 144,
+                    "confidence": 68
+                },
+                "game4": {
+                    "score": 131,
+                    "confidence": 91
+                }
+            },
+            {
+                "name": "유기환",
+                "game1": {
+                    "score": 142,
+                    "confidence": 96
+                },
+                "game2": {
+                    "score": 232,
+                    "confidence": 97
+                },
+                "game3": {
+                    "score": 145,
+                    "confidence": 87
+                },
+                "game4": {
+                    "score": 156,
+                    "confidence": 95
+                }
+            },
+            {
+                "name": "양승우",
+                "game1": {
+                    "score": 167,
+                    "confidence": 97
+                },
+                "game2": {
+                    "score": 144,
+                    "confidence": 95
+                },
+                "game3": {
+                    "score": 152,
+                    "confidence": 96
+                },
+                "game4": {
+                    "score": 159,
+                    "confidence": 94
+                }
+            },
+            {
+                "name": "이정섭",
+                "game1": {
+                    "score": 164,
+                    "confidence": 96
+                },
+                "game2": {
+                    "score": 203,
+                    "confidence": 97
+                },
+                "game3": {
+                    "score": 191,
+                    "confidence": 88
+                },
+                "game4": {
+                    "score": 153,
+                    "confidence": 94
+                }
+            },
+            {
+                "name": "이무석",
+                "game1": {
+                    "score": 128,
+                    "confidence": 96
+                },
+                "game2": {
+                    "score": 185,
+                    "confidence": 90
+                },
+                "game3": {
+                    "score": 209,
+                    "confidence": 88
+                },
+                "game4": {
+                    "score": 220,
+                    "confidence": 65
+                }
+            },
+            {
+                "name": "박남석",
+                "game1": {
+                    "score": 124,
+                    "confidence": 97
+                },
+                "game2": {
+                    "score": 163,
+                    "confidence": 95
+                },
+                "game3": {
+                    "score": 214,
+                    "confidence": 91
+                },
+                "game4": {
+                    "score": 185,
+                    "confidence": 94
+                }
+            },
+            {
+                "name": "전주원",
+                "game1": {
+                    "score": null,
+                    "confidence": 96
+                },
+                "game2": {
+                    "score": 149,
+                    "confidence": 95
+                },
+                "game3": {
+                    "score": 157,
+                    "confidence": 94
+                },
+                "game4": {
+                    "score": 160,
+                    "confidence": 94
+                }
+            },
+            {
+                "name": "유제민",
+                "game1": {
+                    "score": 126,
+                    "confidence": 96
+                },
+                "game2": {
+                    "score": 170,
+                    "confidence": 95
+                },
+                "game3": {
+                    "score": 145,
+                    "confidence": 94
+                },
+                "game4": {
+                    "score": 161,
+                    "confidence": 93
+                }
+            },
+            {
+                "name": "형지영",
+                "game1": {
+                    "score": null,
+                    "confidence": 95
+                },
+                "game2": {
+                    "score": 118,
+                    "confidence": 88
+                },
+                "game3": {
+                    "score": 146,
+                    "confidence": 84
+                },
+                "game4": {
+                    "score": 114,
+                    "confidence": 86
+                }
+            },
+            {
+                "name": "한미화",
+                "game1": {
+                    "score": null,
+                    "confidence": 95
+                },
+                "game2": {
+                    "score": 112,
+                    "confidence": 89
+                },
+                "game3": {
+                    "score": 159,
+                    "confidence": 85
+                },
+                "game4": {
+                    "score": 140,
+                    "confidence": 87
+                }
+            }
+        ]
+    }
+}

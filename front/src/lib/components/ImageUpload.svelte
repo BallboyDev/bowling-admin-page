@@ -34,131 +34,24 @@
     };
 
     const analysis = () => {
-        // if (!!selectImage) {
-        //     progress = true;
+        if (!!selectImage) {
+            progress = true;
 
-        //     const formData = new FormData();
-        //     formData.append("image", selectImage);
-        //     formData.append("title", "title");
+            const formData = new FormData();
+            formData.append("image", selectImage);
+            formData.append("title", "title");
 
-        //     callApi("/api/openai/analysis", "POST", formData)
-        //         .then((res) => {
-        //             console.log(res);
-        //         })
-        //         .finally(() => {
-        //             progress = false;
-        //         });
-        // }
+            callApi("/api/openai/analysis", "POST", formData)
+                .then((res) => {
+                    console.log(res);
 
-        const res = {
-            action: {
-                players: [
-                    {
-                        name: "이정섭",
-                        game1: "226",
-                        game2: "259",
-                        game3: "195",
-                        game4: "192",
-                        avg: "218",
-                    },
-                    {
-                        name: "형지영",
-                        game1: "X",
-                        game2: "110/125",
-                        game3: "128/143",
-                        game4: "89/104",
-                        avg: "116.5",
-                    },
-                    {
-                        name: "박남석",
-                        game1: "188",
-                        game2: "203",
-                        game3: "179",
-                        game4: "180",
-                        avg: "187.5",
-                    },
-                    {
-                        name: "이무석",
-                        game1: "199",
-                        game2: "*245",
-                        game3: "173",
-                        game4: "172",
-                        avg: "197.25",
-                    },
-                    {
-                        name: "전주원",
-                        game1: "*177",
-                        game2: "154",
-                        game3: "143",
-                        game4: "153",
-                        avg: "156.75",
-                    },
-                    {
-                        name: "한미화",
-                        game1: "X",
-                        game2: "X",
-                        game3: "220/235",
-                        game4: "164/179",
-                        avg: "199.5",
-                    },
-                    {
-                        name: "심대승",
-                        game1: "X",
-                        game2: "X",
-                        game3: "177",
-                        game4: "*270",
-                        avg: "223.5",
-                    },
-                    {
-                        name: "유제민",
-                        game1: "X",
-                        game2: "195",
-                        game3: "*132",
-                        game4: "180",
-                        avg: "169",
-                    },
-                    {
-                        name: "김미옥",
-                        game1: "X",
-                        game2: "183/198",
-                        game3: "156/171",
-                        game4: "179/194",
-                        avg: "180.17",
-                    },
-                    {
-                        name: "유기환",
-                        game1: "183",
-                        game2: "206",
-                        game3: "148",
-                        game4: "187",
-                        avg: "181",
-                    },
-                    {
-                        name: "양승우",
-                        game1: "159",
-                        game2: "205",
-                        game3: "198",
-                        game4: "176",
-                        avg: "184.5",
-                    },
-                    {
-                        name: "정귀진",
-                        game1: "201",
-                        game2: "*205",
-                        game3: "192",
-                        game4: "160",
-                        avg: "189.5",
-                    },
-                ],
-            },
-        };
-
-        scoreList = res.action.players.map((v) => {
-            return { ...v, average: 0 };
-        });
+                    scoreList = res.action.players;
+                })
+                .finally(() => {
+                    progress = false;
+                });
+        }
     };
-
-    $inspect(previewUrl);
 </script>
 
 <Modal {isOpen} centered>

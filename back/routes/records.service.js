@@ -1,53 +1,100 @@
 const db = require('../database/db');
 
 const records = async (req, res) => {
-    const result = db.prepare('select * from records order by member_id').all()
-
-    return result.map((v) => {
-        // console.log(v)
-
-        const record = {
-            title_id: v.title_id,
-            member_id: v.member_id,
-            title: v.title,
-            date: v.date,
-            name: v.name,
-            game1: v.game1,
-            game2: v.game2,
-            game3: v.game3,
-            game4: v.game4,
-            total_score: (v.game1 || 0) + (v.game2 || 0) + (v.game3 || 0) + (v.game4 || 0),
-            game_count: (!!v.game1 ? 1 : 0) + (!!v.game2 ? 1 : 0) + (!!v.game3 ? 1 : 0) + (!!v.game4 ? 1 : 0),
-            average: ((v.game1 || 0) + (v.game2 || 0) + (v.game3 || 0) + (v.game4 || 0)) / ((!!v.game1 ? 1 : 0) + (!!v.game2 ? 1 : 0) + (!!v.game3 ? 1 : 0) + (!!v.game4 ? 1 : 0)),
-        }
-
-        return record
-    })
+    return { message: "select * from records" }
 }
 
-const gameList = async (req, res) => {
-    const result = db.prepare(`select ROW_NUMBER() OVER ( ORDER BY title_id ) pos, title, title_id from records group by title order by title_id`).all()
+const recordList = async (eventId) => {
+    try {
+        const query = `
+            select g.eventId, 
+                    r.memberId, 
+                    m.name, 
+                    r.game1, 
+                    r.game2, 
+                    r.game3, 
+                    r.game4, 
+                    r.totalScore,
+                    r.gameCount,
+                    r.average
+                from records r
+                    left outer join members m
+                        on r.memberId = m.id
+                    left outer join events g
+                        on r.eventId = g.eventId
+                where r.eventId = ?;
+        `
 
-    return result
-}
-
-const gameInfo = async (req, res) => {
-    const { id } = req.params;
-
-    if (!id) {
-        return res.status(400).json({
-            message: 'title_id는 필수입니다.'
-        });
+        const result = db.prepare(query).all(eventId)
+        return result
+    } catch (err) {
+        throw err
     }
+}
 
-    const result = db.prepare('select * from records where title_id = ?').all(id)
+const deleteRecord = async (eventId) => {
+    try {
+        const query = `
+            delete from records
+                where eventId = ?
+        `
+        const result = db.prepare(query).run(eventId)
+        return result
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
 
-    return result
+const saveRecords = async (eventId, date, title, records, mainGame) => {
+    // console.log(date, title, records, mainGame)
+
+    try {
+        const result = records.map((v) => {
+            const totalScore = (v?.game1.score || 0) + (v?.game2.score || 0) + (v?.game3.score || 0) + (v?.game4.score || 0)
+            const count = (!!v?.game1.score ? 1 : 0) + (!!v?.game2.score ? 1 : 0) + (!!v?.game3.score ? 1 : 0) + (!!v?.game4.score ? 1 : 0)
+            const average = totalScore / count
+
+            const { id } = db.prepare('select id from members where name = ?').get(v.name)
+
+            const query = `
+                insert into records (eventId, memberId, game1, game2, game3, game4, totalScore, gameCount, average)
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `
+
+            const saveResult = db.prepare(query).run(
+                eventId,
+                id,
+                v.game1.score,
+                v.game2.score,
+                v.game3.score,
+                v.game4.score,
+                totalScore,
+                count,
+                average
+            )
+
+            return {
+                recordId: saveResult.lastInsertRowid,
+                memberId: id,
+                scores: [v.game1.score, v.game2.score, v.game3.score, v.game4.score]
+
+            }
+
+
+        })
+
+        return result
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
 }
 
 
 module.exports = {
     records,
-    gameList,
-    gameInfo
+    recordList,
+    saveRecords,
+    deleteRecord
 }
