@@ -19,7 +19,7 @@ const eventList = async () => {
 const eventInfo = async (eventId) => {
     try {
         const query = `
-            select eventId, title, date, eventType, pattern, player, image
+            select eventId, title, date, eventType, pattern, player, image, lotto
                 from events where eventId = ?
         `
         const result = db.prepare(query).get(eventId)
@@ -46,26 +46,26 @@ const deleteEvent = async (eventId) => {
 
 }
 
-const saveEvent = async (title, date, mainevent, records) => {
+const saveEvent = async (title, date, mainevent, records, pattern, lotto) => {
     try {
-        const ids = await db.prepare(`select distinct eventId from events where date = ?`).all(date)
-
+        const ids = db.prepare(`select distinct eventId from events where date = ?`).all(date)
 
         const eventId = `${date}_${ids.length}`
 
         const query = `
-            insert into events (eventId, title, date, eventType, pattern, player, image)
-            values ( ?, ?, ?, ?, ?, ?, ? )
+            insert into events (eventId, title, date, eventType, pattern, player, image, lotto)
+            values ( ?, ?, ?, ?, ?, ?, ?, ?)
         `
 
-        const result = await db.prepare(query).run(
+        const result = db.prepare(query).run(
             eventId,
             title,
             date,
             mainevent ? 1 : 0,
-            'pattern',
+            pattern,
             records.length,
-            'image'
+            'image',
+            lotto
         )
 
         return eventId

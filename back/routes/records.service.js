@@ -32,7 +32,7 @@ const recordList = async (eventId) => {
     }
 }
 
-const deleteRecord = async (eventId) => {
+const deleteRecordByEventId = async (eventId) => {
     try {
         const query = `
             delete from records
@@ -75,6 +75,7 @@ const saveRecords = async (eventId, date, title, records, mainGame) => {
             )
 
             return {
+                eventId,
                 recordId: saveResult.lastInsertRowid,
                 memberId: id,
                 scores: [v.game1.score, v.game2.score, v.game3.score, v.game4.score]
@@ -96,5 +97,5 @@ module.exports = {
     records,
     recordList,
     saveRecords,
-    deleteRecord
+    deleteRecordByEventId
 }

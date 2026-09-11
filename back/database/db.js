@@ -53,7 +53,8 @@ db.exec(`
 db.exec(`
   create table if not exists games (
     id integer primary key autoincrement,
-    recordId numberic not null,
+    eventId text,
+    recordId numberic,
     memberId numberic not null,
     date text not null,
     score numberic not null,

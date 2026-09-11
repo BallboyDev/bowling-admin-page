@@ -6,6 +6,7 @@
   import EventScore from "./lib/EventScore.svelte";
   import PlayEvent from "./lib/PlayEvent.svelte";
   import ClubRecord from "./lib/ClubRecord.svelte";
+  import PersonalRecord from "./lib/PersonalRecord.svelte";
 
   let selectedTab = $state("");
 </script>
@@ -25,13 +26,19 @@
       <TabPane tabId="member" tab="회원관리">
         <MemberList />
       </TabPane>
+
       <TabPane tabId="scoreRecord" tab="클럽 기록">
-        <ClubRecord />
+        <ClubRecord selected={selectedTab === "scoreRecord"} />
       </TabPane>
-      <TabPane tabId="personScore" tab="개인 기록"></TabPane>
+
+      <TabPane tabId="personScore" tab="개인 기록">
+        <PersonalRecord selected={selectedTab === "personScore"} />
+      </TabPane>
+
       <TabPane tabId="event" tab="정기전" active>
         <EventScore selected={selectedTab === "event"} />
       </TabPane>
+
       <TabPane tabId="playGame" tab="정기전 진행">
         <PlayEvent />
       </TabPane>

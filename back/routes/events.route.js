@@ -35,9 +35,9 @@ router.delete('/:eventId', async (req, res) => {
         const { eventId } = req.params
 
         const eventResult = await eventsService.deleteEvent(eventId)
-        const recordResult = await recordsService.deleteRecord(eventId)
-        // const gameResult = await gamesService.delete()
-        res.json({ result: { eventResult, recordResult } })
+        const recordResult = await recordsService.deleteRecordByEventId(eventId)
+        const gameResult = await gamesService.deleteGameByEventId(eventId)
+        res.json({ result: { eventResult, recordResult, gameResult } })
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: err.message })
@@ -46,9 +46,9 @@ router.delete('/:eventId', async (req, res) => {
 
 router.post('/save', async (req, res) => {
     try {
-        const { records, title, date, mainGame } = req.body
+        const { records, title, date, mainGame, pattern, lotto } = req.body
 
-        const eventId = await eventsService.saveEvent(title, date, mainGame, records)
+        const eventId = await eventsService.saveEvent(title, date, mainGame, records, pattern, lotto)
 
         const recordResult = await recordsService.saveRecords(eventId, date, title, records, mainGame)
 
