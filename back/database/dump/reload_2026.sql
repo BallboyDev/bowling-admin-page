@@ -4,11 +4,10 @@
 -- One-time migration: game5/game6 must not already exist.
 -- Execute the complete file with stop-on-error enabled.
 -- On any error, stop and ROLLBACK; do not continue to COMMIT.
--- Expected: 30 members, 27 events, 274 records, 1032 games.
+-- Expected with the original 25 base members: 30 members, 27 events, 1032 games.
+-- Destructive historical fixture reload; run only against a backed-up test DB initialized with database/init.js.
 BEGIN IMMEDIATE;
 
-ALTER TABLE records ADD COLUMN game5 NUMERIC;
-ALTER TABLE records ADD COLUMN game6 NUMERIC;
 
 INSERT INTO members (id, name, phone) VALUES
     (10001, '최신현', '010-0000-0000'),
@@ -20,7 +19,6 @@ INSERT INTO members (id, name, phone) VALUES
 UPDATE members SET phone = '010-0000-0000';
 
 DELETE FROM games;
-DELETE FROM records;
 DELETE FROM events;
 
 INSERT INTO events (eventId, title, date, eventType, pattern, player, image) VALUES
@@ -52,8 +50,8 @@ INSERT INTO events (eventId, title, date, eventType, pattern, player, image) VAL
     ('2026-08-03_0', '8월 1주차', '2026-08-03', 1, 'pattern', 8, 'image'),
     ('2026-08-10_0', '8월 2주차', '2026-08-10', 1, 'pattern', 6, 'image');
 
-INSERT INTO records (eventId, memberId, game1, game2, game3, game4, game5, game6, totalScore, gameCount, average) VALUES
-    ('2026-01-05_0', 4, 192, 237, 172, 215, NULL, NULL, 816, 4, 816 * 1.0 / 4),
+WITH score_input (eventId, memberId, game1, game2, game3, game4, game5, game6, totalScore, gameCount, average) AS (
+    VALUES ('2026-01-05_0', 4, 192, 237, 172, 215, NULL, NULL, 816, 4, 816 * 1.0 / 4),
     ('2026-01-05_0', 13, 238, 201, 177, 209, NULL, NULL, 825, 4, 825 * 1.0 / 4),
     ('2026-01-05_0', 19, 259, 228, 177, 191, NULL, NULL, 855, 4, 855 * 1.0 / 4),
     ('2026-01-05_0', 12, 215, 172, 200, 171, NULL, NULL, 758, 4, 758 * 1.0 / 4),
@@ -326,27 +324,29 @@ INSERT INTO records (eventId, memberId, game1, game2, game3, game4, game5, game6
     ('2026-08-10_0', 3, 192, 181, 223, 161, 182, NULL, 939, 5, 939 * 1.0 / 5),
     ('2026-08-10_0', 17, 161, 178, 227, 135, 191, NULL, 892, 5, 892 * 1.0 / 5),
     ('2026-08-10_0', 13, 168, 200, 176, 222, 135, NULL, 901, 5, 901 * 1.0 / 5),
-    ('2026-08-10_0', 22, 118, 148, 182, 154, 185, NULL, 787, 5, 787 * 1.0 / 5);
-
--- One game row per non-NULL score, including game5 and game6.
-INSERT INTO games (eventId, recordId, memberId, date, score, center, records)
-SELECT r.eventId, r.id, r.memberId, e.date, s.score, NULL, 0
-FROM records r
-JOIN events e ON e.eventId = r.eventId
-JOIN (
-    SELECT id AS recordId, 1 AS game_number, game1 AS score FROM records
-    UNION ALL SELECT id, 2, game2 FROM records
-    UNION ALL SELECT id, 3, game3 FROM records
-    UNION ALL SELECT id, 4, game4 FROM records
-    UNION ALL SELECT id, 5, game5 FROM records
-    UNION ALL SELECT id, 6, game6 FROM records
-) s ON s.recordId = r.id
+    ('2026-08-10_0', 22, 118, 148, 182, 154, 185, NULL, 787, 5, 787 * 1.0 / 5)
+), numbered_scores AS (
+    SELECT eventId, memberId, 1 AS gameNumber, game1 AS score FROM score_input
+    UNION ALL
+    SELECT eventId, memberId, 2 AS gameNumber, game2 AS score FROM score_input
+    UNION ALL
+    SELECT eventId, memberId, 3 AS gameNumber, game3 AS score FROM score_input
+    UNION ALL
+    SELECT eventId, memberId, 4 AS gameNumber, game4 AS score FROM score_input
+    UNION ALL
+    SELECT eventId, memberId, 5 AS gameNumber, game5 AS score FROM score_input
+    UNION ALL
+    SELECT eventId, memberId, 6 AS gameNumber, game6 AS score FROM score_input
+)
+INSERT INTO games (eventId, memberId, gameNumber, date, score, center)
+SELECT s.eventId, s.memberId, s.gameNumber, e.date, s.score, e.center
+FROM numbered_scores s
+JOIN events e ON e.eventId = s.eventId
 WHERE s.score IS NOT NULL
-ORDER BY r.id, s.game_number;
+ORDER BY e.id, s.memberId, s.gameNumber;
 
 COMMIT;
 
 SELECT 'members' AS table_name, COUNT(*) AS row_count FROM members
 UNION ALL SELECT 'events', COUNT(*) FROM events
-UNION ALL SELECT 'records', COUNT(*) FROM records
 UNION ALL SELECT 'games', COUNT(*) FROM games;

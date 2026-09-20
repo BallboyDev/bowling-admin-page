@@ -10,6 +10,7 @@
     import ImageUpload from "./components/ImageUpload.svelte";
     import DrawWinner from "./components/DrawWinner.svelte";
     import SaveRecords from "./components/SaveRecords.svelte";
+    import Footer from "./components/Footer.svelte";
 
     interface Game {
         score: number | null;
@@ -30,15 +31,24 @@
     let drawOpen = $state(false);
     let winnerIndex = $state<number | null>(null);
     let drawRound = $state(0);
-    const canDraw = $derived(scoreList.length > 0 && scoreList.every((row) => row.name.trim().length > 0));
-    const winnerName = $derived(winnerIndex == null ? null : scoreList[winnerIndex]?.name.trim() || null);
+    const canDraw = $derived(
+        scoreList.length > 0 &&
+            scoreList.every((row) => row.name.trim().length > 0),
+    );
+    const winnerName = $derived(
+        winnerIndex == null
+            ? null
+            : scoreList[winnerIndex]?.name.trim() || null,
+    );
     const draw = () => {
         if (!canDraw) return;
         // Rejection sampling gives every participant row the same chance.
         const count = scoreList.length;
         const limit = Math.floor(0x100000000 / count) * count;
         const random = new Uint32Array(1);
-        do { crypto.getRandomValues(random); } while (random[0] >= limit);
+        do {
+            crypto.getRandomValues(random);
+        } while (random[0] >= limit);
         winnerIndex = random[0] % count;
         drawRound++;
         drawOpen = true;
@@ -141,21 +151,40 @@
                     if (canSave) saveOpen = true;
                 }}>저장</Button
             >
-            <Button color="primary" outline class="py-2" disabled={!canDraw} onclick={draw}
-                >뽑기</Button
+            <Button
+                color="primary"
+                outline
+                class="py-2"
+                disabled={!canDraw}
+                onclick={draw}>뽑기</Button
             >
         </div>
     </header>
     {#if winnerName}
-        <div class="border rounded-3 bg-primary-subtle text-primary-emphasis p-3 mb-3" role="status">
-            <i class="bi bi-trophy me-2" aria-hidden="true"></i>뽑기 당첨자: <strong>{winnerName}</strong>
-            <Button color="link" class="ms-2" onclick={() => { drawOpen = true; }}>결과 보기</Button>
+        <div
+            class="border rounded-3 bg-primary-subtle text-primary-emphasis p-3 mb-3"
+            role="status"
+        >
+            <i class="bi bi-trophy me-2" aria-hidden="true"></i>뽑기 당첨자:
+            <strong>{winnerName}</strong>
+            <Button
+                color="link"
+                class="ms-2"
+                onclick={() => {
+                    drawOpen = true;
+                }}>결과 보기</Button
+            >
         </div>
     {/if}
     {#if scoreList.length === 0}
         <Card class="bg-body-tertiary rounded-3"
             ><CardBody class="p-4 p-md-5 text-center">
-                <img src="/gbc.png" alt="개빡세 볼링클럽" class="img-fluid" style="max-width: 10rem;" />
+                <img
+                    src="/gbc.png"
+                    alt="개빡세 볼링클럽"
+                    class="img-fluid"
+                    style="max-width: 10rem;"
+                />
                 <h3 class="h5 fw-semibold mt-3">점수 사진을 등록해 주세요</h3>
                 <p class="small text-body-secondary mb-0">
                     점수표를 촬영하거나 이미지를 업로드하면 회원별 점수를
@@ -196,9 +225,22 @@
                                 class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2"
                             >
                                 <div class="flex-grow-1" style="min-width: 0;">
-                                    <label class="form-label small text-body-secondary" for={`${uid}-name-${index}`}>회원 이름</label>
-                                    <Input id={`${uid}-name-${index}`} bind:value={row.name} class="fw-semibold" invalid={!row.name.trim()} placeholder="회원 이름을 입력하세요" />
-                                    {#if !row.name.trim()}<span class="small text-danger">이름을 입력해 주세요.</span>{/if}
+                                    <label
+                                        class="form-label small text-body-secondary"
+                                        for={`${uid}-name-${index}`}
+                                        >회원 이름</label
+                                    >
+                                    <Input
+                                        id={`${uid}-name-${index}`}
+                                        bind:value={row.name}
+                                        class="fw-semibold"
+                                        invalid={!row.name.trim()}
+                                        placeholder="회원 이름을 입력하세요"
+                                    />
+                                    {#if !row.name.trim()}<span
+                                            class="small text-danger"
+                                            >이름을 입력해 주세요.</span
+                                        >{/if}
                                 </div>
                                 <span class="small text-body-secondary"
                                     >평균 <strong class="fs-5 text-primary"
@@ -262,6 +304,7 @@
             {/each}
         </ul>
     {/if}
+    <Footer />
 </section>
 
 <ImageUpload
@@ -271,4 +314,10 @@
     bind:scoreList
 />
 <SaveRecords bind:isOpen={saveOpen} {scoreList} lotto={winnerName} />
-<DrawWinner bind:isOpen={drawOpen} {winnerName} round={drawRound} canDraw={canDraw} onDraw={draw} />
+<DrawWinner
+    bind:isOpen={drawOpen}
+    {winnerName}
+    round={drawRound}
+    {canDraw}
+    onDraw={draw}
+/>

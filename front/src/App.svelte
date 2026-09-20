@@ -7,11 +7,14 @@
   import PlayEvent from "./lib/PlayEvent.svelte";
   import ClubRecord from "./lib/ClubRecord.svelte";
   import PersonalRecord from "./lib/PersonalRecord.svelte";
+  import Footer from "./lib/components/Footer.svelte";
 
   let selectedTab = $state("");
+
+  const uid = $props.id();
 </script>
 
-<div class="m-3">
+<section class="m-3" aria-labelledby={`${uid}-main`}>
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>2026 개빡세 회원 점수관리</h3>
     <Button>관리자</Button>
@@ -31,11 +34,11 @@
         <ClubRecord selected={selectedTab === "scoreRecord"} />
       </TabPane>
 
-      <TabPane tabId="personScore" tab="개인 기록">
+      <TabPane tabId="personScore" tab="개인 기록" active>
         <PersonalRecord selected={selectedTab === "personScore"} />
       </TabPane>
 
-      <TabPane tabId="event" tab="정기전" active>
+      <TabPane tabId="event" tab="정기전">
         <EventScore selected={selectedTab === "event"} />
       </TabPane>
 
@@ -44,7 +47,7 @@
       </TabPane>
     </TabContent>
   </div>
-</div>
+</section>
 
 <style>
   :global(.nav-tabs) {

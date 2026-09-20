@@ -3,7 +3,18 @@ const db = require('../database/db');
 const members = async () => {
 
     console.log('members')
-    const result = db.prepare('select * from members order by auth ').all();
+    const result = db.prepare(`
+            select id, 
+                    name, 
+                    auth, 
+                    phone, 
+                    style, 
+                    birth, 
+                    created_at as joinDate, 
+                    grade
+                from members 
+                order by auth
+        `).all();
 
     return result;
 
@@ -17,6 +28,7 @@ const memberStatistics = async (year) => {
         SELECT
             s.id AS "memberId",
             s.name AS "memberName",
+            s.grade as "memberGrade",
             s.attendance_count AS "attendanceCount",
             ROUND(
                 s.attendance_count * 100.0 / NULLIF((
@@ -44,41 +56,23 @@ const memberStatistics = async (year) => {
             SELECT
                 m.id,
                 m.name,
-                COUNT(r.id) AS attendance_count,
-                COALESCE(SUM(r.gameCount), 0) AS game_count,
-                SUM(r.totalScore) AS total_score,
-                SUM(r.totalScore) * 1.0
-                    / NULLIF(SUM(r.gameCount), 0) AS average_score,
-                MAX((
-                    SELECT MAX(score)
-                    FROM (
-                        SELECT r.game1 AS score
-                        UNION ALL SELECT r.game2
-                        UNION ALL SELECT r.game3
-                        UNION ALL SELECT r.game4
-                    )
-                ))
-                - MIN((
-                    SELECT MIN(score)
-                    FROM (
-                        SELECT r.game1 AS score
-                        UNION ALL SELECT r.game2
-                        UNION ALL SELECT r.game3
-                        UNION ALL SELECT r.game4
-                    )
-                )) AS score_range
+                m.grade,
+                COUNT(DISTINCT g.eventId) AS attendance_count,
+                COUNT(g.id) AS game_count,
+                SUM(g.score) AS total_score,
+                AVG(g.score) AS average_score,
+                MAX(g.score) - MIN(g.score) AS score_range
             FROM members m
-            LEFT JOIN records r
-                ON r.memberId = m.id
+            LEFT JOIN games g
+                ON g.memberId = m.id
                AND EXISTS (
                     SELECT 1
                     FROM events e
-                    WHERE e.eventId = r.eventId
+                    WHERE e.eventId = g.eventId
                       AND e.date >= @startDate AND e.date < @endDate
                )
             GROUP BY m.id, m.name
         ) s
-        ORDER BY "scoreRank", s.id
     `).all({ startDate, endDate });
 }
 

@@ -8,6 +8,8 @@
     } from "@sveltestrap/sveltestrap";
     import PersonalRecordPeriod from "./components/PersonalRecordPeriod.svelte";
     import AddPersonalRecord from "./components/AddPersonalRecord.svelte";
+    import { callApi } from "./api/callApi";
+    import Footer from "./components/Footer.svelte";
 
     interface Game {
         id: number;
@@ -20,49 +22,70 @@
     }
     let { selected = true }: { selected?: boolean } = $props();
     const uid = $props.id();
+    let memberId = $state<number | null>(1);
     let periodOpen = $state(false);
     let addOpen = $state(false);
-    let startDate = $state("2026-01-01");
-    let endDate = $state("2026-12-31");
-    // 미리보기 데이터. 실제 회원 ID나 실제 기록으로 사용하지 않습니다.
-    let previewGames = $state<Game[]>([
-        { id: 1, date: "2026-08-15", center: "예시 볼링장 A", score: 165, sequence: 1, type: "regular", eventId: "preview-1" },
-        { id: 2, date: "2026-08-15", center: "예시 볼링장 A", score: 182, sequence: 2, type: "regular", eventId: "preview-1" },
-        { id: 3, date: "2026-08-22", center: "예시 볼링장 B", score: 201, sequence: 1, type: "personal", eventId: null },
-        { id: 4, date: "2026-08-22", center: "예시 볼링장 B", score: 174, sequence: 2, type: "personal", eventId: null },
-        { id: 5, date: "2026-09-05", center: "예시 볼링장 A", score: 190, sequence: 1, type: "regular", eventId: "preview-2" },
-        { id: 6, date: "2026-09-05", center: "예시 볼링장 A", score: 215, sequence: 2, type: "regular", eventId: "preview-2" },
-        { id: 7, date: "2026-09-05", center: "예시 볼링장 B", score: 178, sequence: 3, type: "personal", eventId: null },
-    ]);
-    const games = $derived(previewGames.filter((game) => game.date >= startDate && game.date <= endDate));
-    const status = "ready";
+    const currentYear = new Date().getFullYear();
+    let startDate = $state(`${currentYear}-01-01`);
+    let endDate = $state(`${currentYear}-12-31`);
+    let games = $state<Game[]>([]);
+    let recordScope = $state<"all" | "regular">("all");
+    const filteredGames = $derived(
+        recordScope === "regular"
+            ? games.filter((game) => game.type === "regular")
+            : games,
+    );
+    let status = $state<"loading" | "ready" | "error">("loading");
     let notice = $state("");
-    /**
-     * 제안 조회 API (미구현): GET /api/me/games?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
-     * 서버는 로그인 회원을 식별하고 접근 권한을 확인합니다. 임의 회원 ID를 사용하지 않습니다.
-     * 날짜 양 끝 포함, 한국 현지 경기일 기준. 응답: { games: Game[] }, 기록 없음은 [].
-     * score는 0~300 정수 또는 null(미입력). center는 문자열 또는 null.
-     * sequence는 동일 날짜의 게임 순서. type은 regular/personal, 개인 경기는 eventId: null.
-     * 400: 잘못된 기간, 401: 로그인 필요, 5xx: 서버 오류.
-     * API 연결 시 previewGames를 실제 응답으로 교체하고 예시 데이터/안내를 제거합니다.
-     */
-    const applyPeriod = (start: string, end: string) => {
+    let refresh = $state(0);
+
+    $effect(() => {
+        if (!selected) return;
+        void refresh;
+        let active = true;
+        status = "loading";
+        games = [];
+        callApi(
+            `/api/games/${memberId}?start=${startDate}&end=${endDate}`,
+            "GET",
+        )
+            .then((res) => {
+                if (!active) return;
+                if (!Array.isArray(res?.games))
+                    throw new Error("Invalid games response");
+                games = res.games;
+                status = "ready";
+            })
+            .catch(() => {
+                if (active) status = "error";
+            });
+        return () => {
+            active = false;
+        };
+    });
+
+    const applyPeriod = (
+        start: string,
+        end: string,
+        scope: "all" | "regular",
+    ) => {
+        recordScope = scope;
         startDate = start;
         endDate = end;
         notice = "";
         periodOpen = false;
     };
-    const addPreview = (entry: { date: string; center: string; scores: number[] }) => {
-        let id = Math.max(0, ...previewGames.map((game) => game.id));
-        const offset = Math.max(0, ...previewGames.filter((game) => game.date === entry.date).map((game) => game.sequence));
-        previewGames = [...previewGames, ...entry.scores.map((score, index): Game => ({
-            id: ++id, date: entry.date, center: entry.center, score, sequence: offset + index + 1,
-            type: "personal", eventId: null,
-        }))];
+    const handleSaved = (date: string) => {
         addOpen = false;
-        notice = entry.date < startDate || entry.date > endDate
-            ? "미리보기에 추가했습니다. 조회 기간 밖의 기록이므로 기간을 변경하면 확인할 수 있습니다. 서버에는 저장되지 않았습니다."
-            : "미리보기에 추가했습니다. 서버에는 저장되지 않았으며 새로고침하면 초기화됩니다.";
+        notice =
+            date < startDate || date > endDate
+                ? "기록을 저장했습니다. 조회 기간 밖의 기록이므로 기간을 변경하면 확인할 수 있습니다."
+                : "기록을 저장했습니다.";
+        if (recordScope === "regular") {
+            notice +=
+                " 개인 기록을 확인하려면 조회 범위를 ‘모두 조회’로 변경해 주세요.";
+        }
+        refresh += 1;
     };
     const validScore = (score: number | null): score is number =>
         typeof score === "number" && Number.isFinite(score);
@@ -83,10 +106,10 @@
                   minimumFractionDigits: digits,
                   maximumFractionDigits: digits,
               });
-    const summary = $derived(stats(games));
+    const summary = $derived(stats(filteredGames));
     const days = $derived.by(() => {
         const grouped = new Map<string, Game[]>();
-        for (const game of games)
+        for (const game of filteredGames)
             grouped.set(game.date, [...(grouped.get(game.date) ?? []), game]);
         return [...grouped]
             .sort(([a], [b]) => b.localeCompare(a))
@@ -117,7 +140,6 @@
             .map((day) => `${chartX(day.date)},${chartY(day.average!)}`)
             .join(" "),
     );
-
 </script>
 
 <section
@@ -134,14 +156,50 @@
                 나의 게임 기록과 점수 변화를 확인하세요.
             </p>
         </div>
-        <Button color="primary" onclick={() => { addOpen = true; }}>개인 게임 기록 추가</Button>
+        <Button
+            color="primary"
+            onclick={() => {
+                addOpen = true;
+            }}>개인 게임 기록 추가</Button
+        >
     </header>
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <span class="small text-body-secondary">{startDate} ~ {endDate}</span>
-        <Button color="primary" outline onclick={() => { periodOpen = true; }}>기간 변경</Button>
+    <div
+        class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3"
+    >
+        <span class="small text-body-secondary"
+            >{startDate} ~ {endDate} · {recordScope === "all"
+                ? "모두 조회"
+                : "정기전만 조회"}</span
+        >
+        <Button
+            color="primary"
+            outline
+            onclick={() => {
+                periodOpen = true;
+            }}>조회 조건 변경</Button
+        >
     </div>
-    <Alert color="info">미리보기용 예시 데이터입니다. 입력한 기록도 서버에 저장되지 않으며 새로고침하면 초기화됩니다.</Alert>
     {#if notice}<p class="small text-primary" role="status">{notice}</p>{/if}
+    {#if status === "loading"}
+        <p class="text-body-secondary" role="status">
+            기록을 불러오는 중입니다.
+        </p>
+    {:else if status === "error"}
+        <Alert color="danger">
+            <p role="alert">
+                {notice
+                    ? "저장은 완료되었지만 목록을 불러오지 못했습니다."
+                    : "기록을 불러오지 못했습니다."} 다시 시도해 주세요.
+            </p>
+            <Button
+                color="danger"
+                outline
+                onclick={() => {
+                    refresh += 1;
+                }}>다시 조회</Button
+            >
+        </Alert>
+    {/if}
 
     <div class="row row-cols-3 g-2 mb-3">
         {#each [{ label: "기간 평균", value: summary.average, digits: 2 }, { label: "최고 점수", value: summary.highest, digits: 0 }, { label: "총 게임 수", value: summary.count, digits: 0 }] as metric}
@@ -223,7 +281,9 @@
             {:else}<p class="text-center text-body-secondary py-4 mb-0">
                     {status === "ready"
                         ? "표시할 점수 기록이 없습니다."
-                        : "기록이 연결되면 점수 변화를 표시합니다."}
+                        : status === "loading"
+                          ? "기록을 불러오는 중입니다."
+                          : "기록을 조회하지 못했습니다."}
                 </p>{/if}
         </CardBody></Card
     >
@@ -233,10 +293,12 @@
             class="text-body-secondary py-3"
             role="status"
         >
-            선택한 기간에 기록이 없습니다.
+            선택한 기간과 조회 범위에 해당하는 기록이 없습니다.
         </p>
     {:else if status !== "ready"}<p class="text-body-secondary small">
-            기록 조회 후 날짜별 게임과 경기장을 확인할 수 있습니다.
+            {status === "loading"
+                ? "날짜별 기록을 불러오는 중입니다."
+                : "다시 조회하면 날짜별 기록을 확인할 수 있습니다."}
         </p>
     {:else}
         <div class="d-flex flex-column gap-3">
@@ -285,7 +347,18 @@
             {/each}
         </div>
     {/if}
+    <Footer />
 </section>
 
-<PersonalRecordPeriod bind:isOpen={periodOpen} {startDate} {endDate} onApply={applyPeriod} />
-<AddPersonalRecord bind:isOpen={addOpen} onPreview={addPreview} />
+<PersonalRecordPeriod
+    bind:isOpen={periodOpen}
+    {startDate}
+    {endDate}
+    {recordScope}
+    onApply={applyPeriod}
+/>
+<AddPersonalRecord
+    bind:isOpen={addOpen}
+    onSaved={handleSaved}
+    memberId={memberId ?? undefined}
+/>

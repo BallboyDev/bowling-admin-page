@@ -8,6 +8,8 @@
     let phone = $state("");
     let style = $state("");
     let birth = $state("");
+    let handicap = $state<number | string | undefined>("");
+    let grade = $state("");
     let busy = $state(false);
     let error = $state("");
     let loading = $state(false);
@@ -20,6 +22,8 @@
             phone = "";
             style = "";
             birth = "";
+            handicap = "";
+            grade = "";
             error = "";
         }
     });
@@ -29,10 +33,16 @@
             error = "이름과 연락처를 입력해 주세요.";
             return;
         }
+        const handicapValue = handicap == null || String(handicap).trim() === "" ? null : Number(handicap);
+        const gradeValue = grade === "" ? null : Number(grade);
+        if ((handicapValue !== null && !Number.isSafeInteger(handicapValue)) || (gradeValue !== null && gradeValue !== 1 && gradeValue !== 2)) {
+            error = "핸디캡은 정수로 입력하고 등급은 1군 또는 2군을 선택해 주세요.";
+            return;
+        }
         busy = true;
         error = "";
         try {
-            await callApi("/api/members/create", "POST", { name, auth: Number(auth), phone, style, birth });
+            await callApi("/api/members/create", "POST", { name, auth: Number(auth), phone, style, birth, handicap: handicapValue, grade: gradeValue });
             isOpen = false;
         } catch {
             error = "저장하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.";
@@ -76,6 +86,19 @@
                     <div>
                         <label class="form-label fw-semibold small" for={`${uid}-birth`}>생년월일</label>
                         <Input id={`${uid}-birth`} bind:value={birth} placeholder="예: 1990-01-01" class="py-2" />
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-semibold small" for={`${uid}-handicap`}>핸디캡</label>
+                        <Input id={`${uid}-handicap`} type="number" step="1" bind:value={handicap} placeholder="미지정" class="py-2" />
+                    </div>
+                    <div>
+                        <label class="form-label fw-semibold small" for={`${uid}-grade`}>등급</label>
+                        <Input id={`${uid}-grade`} type="select" bind:value={grade} class="py-2">
+                            <option value="">미지정</option>
+                            <option value="1">1군</option>
+                            <option value="2">2군</option>
+                        </Input>
                     </div>
                 </fieldset>
             </form>
