@@ -1,22 +1,87 @@
--- Source: temp.txt (same directory)
--- Replaces ALL rows in events, records and games; preserves existing members.
--- Updates every member phone and adds five members with explicit IDs.
--- One-time migration: game5/game6 must not already exist.
--- Execute the complete file with stop-on-error enabled.
--- On any error, stop and ROLLBACK; do not continue to COMMIT.
--- Expected with the original 25 base members: 30 members, 27 events, 1032 games.
--- Destructive historical fixture reload; run only against a backed-up test DB initialized with database/init.js.
+-- Game source: temp.txt (same directory).
+-- Member source: all 30 rows and all columns from app.db at generation time.
+-- Creates missing tables and indexes; does not migrate older existing schemas.
+-- No separate member restore is needed for an empty database.
+-- Existing member IDs cause an error; this is not a repeatable seed script.
+-- Replaces ALL events and games. Back up any existing database first.
+-- Expected on an empty database: 30 members, 27 events, 1032 games.
+-- Execute with stop-on-error enabled. On error, ROLLBACK; do not continue.
 BEGIN IMMEDIATE;
 
+CREATE TABLE IF NOT EXISTS members (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                auth NUMBERIC NOT NULL DEFAULT 2,
+                name TEXT NOT NULL,
+                phone NUMERIC NOT NULL,
+                handicap NUMBERIC DEFAULT 0,
+                style TEXT,
+                birth TEXT DEFAULT CURRENT_TIMESTAMP,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                grade INTEGER NOT NULL DEFAULT 0
+            );
 
-INSERT INTO members (id, name, phone) VALUES
-    (10001, '최신현', '010-0000-0000'),
-    (10002, '이세찬', '010-0000-0000'),
-    (10003, '이승우', '010-0000-0000'),
-    (10004, '오주환', '010-0000-0000'),
-    (10005, '김세휘', '010-0000-0000');
+CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                eventId TEXT NOT NULL,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL,
+                eventType BOOLEAN DEFAULT TRUE,
+                pattern TEXT,
+                player NUMBER,
+                image TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                lotto TEXT,
+                center TEXT
+            );
 
-UPDATE members SET phone = '010-0000-0000';
+CREATE TABLE IF NOT EXISTS games (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        eventId TEXT,
+        memberId NUMERIC NOT NULL,
+        gameNumber INTEGER CHECK (gameNumber IS NULL OR (typeof(gameNumber) = 'integer' AND gameNumber > 0)),
+        date TEXT NOT NULL,
+        score INTEGER NOT NULL CHECK (typeof(score) = 'integer' AND score BETWEEN 0 AND 300),
+        center TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CHECK (eventId IS NULL OR gameNumber IS NOT NULL)
+    );
+
+CREATE UNIQUE INDEX IF NOT EXISTS events_eventId_unique ON events(eventId);
+    CREATE UNIQUE INDEX IF NOT EXISTS games_event_member_number_unique
+        ON games(eventId, memberId, gameNumber);
+    CREATE INDEX IF NOT EXISTS games_member_date ON games(memberId, date);
+
+INSERT INTO members (id, auth, name, phone, handicap, style, birth, created_at, grade) VALUES
+    (1, 0, '양승우', '010-0000-0000', 0, '덤리스', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (2, 1, '최민우', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (3, 1, '심대승', '010-0000-0000', 0, '크랭커', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (4, 1, '전형서', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (5, 1, '전주원', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (6, 1, '박남석', '010-0000-0000', 0, '크랭커', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (7, 2, '김미옥', '010-0000-0000', 15, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (8, 2, '김엘리사', '010-0000-0000', 15, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (9, 2, '민형석', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (10, 2, '배세영', '010-0000-0000', 0, '덤리스', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (11, 2, '양설희', '010-0000-0000', 15, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (12, 2, '여선주', '010-0000-0000', 15, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (13, 2, '유기환', '010-0000-0000', 0, '크랭커', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (14, 2, '유제민', '010-0000-0000', 0, '크랭커', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (15, 2, '이무석', '010-0000-0000', 0, '크랭커', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (16, 2, '이성현', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (17, 2, '정귀진', '010-0000-0000', 0, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (18, 2, '정의돈', '010-0000-0000', 0, '', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (19, 2, '주성연', '010-0000-0000', 0, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (20, 2, '최재영', '010-0000-0000', 0, '', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (21, 2, '한미화', '010-0000-0000', 15, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (22, 2, '형지영', '010-0000-0000', 15, '아대', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (23, 2, '전준수', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (24, 2, '이정섭', '010-0000-0000', 0, '크랭커', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (25, 2, '권준하', '010-0000-0000', 0, '투핸드', '2026-01-01', '2026-08-10 09:19:50', 1),
+    (10001, 2, '최신현', '010-0000-0000', 0, NULL, '2026-09-09 05:27:27', '2026-09-09 05:27:27', 1),
+    (10002, 2, '이세찬', '010-0000-0000', 0, NULL, '2026-09-09 05:27:27', '2026-09-09 05:27:27', 1),
+    (10003, 2, '이승우', '010-0000-0000', 0, NULL, '2026-09-09 05:27:27', '2026-09-09 05:27:27', 1),
+    (10004, 2, '오주환', '010-0000-0000', 0, NULL, '2026-09-09 05:27:27', '2026-09-09 05:27:27', 1),
+    (10005, 2, '김세휘', '010-0000-0000', 0, NULL, '2026-09-09 05:27:27', '2026-09-09 05:27:27', 1);
 
 DELETE FROM games;
 DELETE FROM events;
