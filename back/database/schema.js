@@ -34,7 +34,8 @@ const initializeSchema = (db) => {
                 style TEXT,
                 birth TEXT DEFAULT CURRENT_TIMESTAMP,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                grade INTEGER NOT NULL DEFAULT 0
+                grade INTEGER NOT NULL DEFAULT 0,
+                password text not null default '0000'
             );
             CREATE TABLE IF NOT EXISTS events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
